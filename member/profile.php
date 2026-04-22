@@ -1,43 +1,108 @@
 <?php
-require_once 'auth_check.php';
-requireRole(['admin', 'member']);
+/* member/profile.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'member';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Member';
+
+$pageTitle = 'My Profile';
+$topbarTitle = 'Profil Saya';
+$topbarSubtitle = 'Kelola data akun pribadi dan informasi membership kamu.';
+$searchPlaceholder = 'Cari data profil...';
+
+include '../includes/layout_top.php';
+
+$profile = [
+  'name' => $_SESSION['name'] ?? 'Michael Member',
+  'email' => 'member@gymbrut.com',
+  'phone' => '0812-1122-3344',
+  'address' => 'Jl. Fitness No. 12, Palembang',
+  'package' => 'Premium Plus',
+];
 ?>
 
-<?php $pageTitle = 'Profile | GYMBRUT';
-$activePage = 'profile';
-$topbarTitle = 'Profile User';
-include 'includes/layout_top.php'; ?>
-<div class="row g-4">
+<section class="page-section">
+  <div class="page-grid grid-2">
+    <div class="card-soft">
+      <div class="d-flex align-center gap-12 mb-3">
+        <div class="profile-chip-avatar" style="width:64px;height:64px;border-radius:18px;">
+          <?= strtoupper(substr($profile['name'], 0, 1)) ?>
+        </div>
+        <div>
+          <h3 class="section-title mb-0"><?= e($profile['name']) ?></h3>
+          <p class="section-subtitle"><?= e($profile['package']) ?></p>
+        </div>
+      </div>
 
-    
-       
-       
-      
-      
-    
-    <div class="col-lg-4">
-    <div class="premium-car
-      d text-center h-100"><img src="https://ui-avatars
-      .com/api/?name=Soni+Ju
-        liansyah&background=ff7a00&color=fff&size=180" class="rounded-circle mb-3" width="140" height="140"><div class="
-        sectio
-        n-title">Soni Juliansyah</div><p class="text-white-50">Member Premium • Strength Focus</
-p           ><button class="gradient-btn">U
-        pload Foto</button></div></div>
+      <div class="card-list">
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">Email</p>
+            <p class="list-row-subtitle"><?= e($profile['email']) ?></p>
+          </div>
+        </div>
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">Nomor HP</p>
+            <p class="list-row-subtitle"><?= e($profile['phone']) ?></p>
+          </div>
+        </div>
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">Alamat</p>
+            <p class="list-row-subtitle"><?= e($profile['address']) ?></p>
+          </div>
+        </div>
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">Paket Aktif</p>
+            <p class="list-row-subtitle"><?= e($profile['package']) ?></p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        
-        
-            
-            
-            
-          
-        
-           
-        
-           
-        
-      
-    
-    <div class="col-lg-8"><div class="form-card"><div class="section-title mb-3">Edit Profil</div><form class="row g-3"><div class="col-md-6"><label class="form-label">Nama</label><input class="form-control" value="Soni Juliansyah"></div><div class="col-md-6"><label class="form-label">Email</label><input class="form-control" value="soni@gymbrut.com"></div><div class="col-md-6"><label class="form-label">No HP</label><input class="form-control" value="081234567890"></div><div class="col-md-6"><label class="form-label">Target</label><select class="form-select"><option>Strength</option><option>Fat Loss</option><option>Bulking</option></select></div><div class="col-md-6"><label class="form-label">Password Baru</label><input type="password" class="form-control" placeholder="••••••••"></div><div class="col-md-6"><label class="form-label">Konfirmasi Password</label><input type="password" class="form-control" placeholder="••••••••"></div><div class="col-12 d-grid"><button type="button" class="gradient-btn py-3">Update Profil</button></div></form></div></div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+    <div class="form-card">
+      <div class="card-header-inline">
+        <div>
+          <h3 class="section-title">Update Profil</h3>
+          <p class="section-subtitle">Edit data member dengan form yang clean dan konsisten.</p>
+        </div>
+      </div>
+
+      <form class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nama</label>
+          <input type="text" class="form-control" value="<?= e($profile['name']) ?>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" value="<?= e($profile['email']) ?>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nomor HP</label>
+          <input type="text" class="form-control" value="<?= e($profile['phone']) ?>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Paket Aktif</label>
+          <input type="text" class="form-control" value="<?= e($profile['package']) ?>" readonly>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Alamat</label>
+          <textarea><?= e($profile['address']) ?></textarea>
+        </div>
+
+        <div class="form-group full">
+          <button type="button" class="gradient-btn w-100">
+            <i class="bi bi-check2-circle"></i> Simpan Profil
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>

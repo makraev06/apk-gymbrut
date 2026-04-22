@@ -1,31 +1,89 @@
-<?php $pageTitle='Memberships | GYMBRUT'; $activePage='memberships'; $topbarTitle='Membership Packages'; include 'includes/layout_top.php'; ?>
-<div class="row g-4">
-  <div class="col-lg-8">
-    <div class="table-card">
-      <div class="section-title mb-3">Paket Membership</div>
-      <div class="row g-3">
-        <div class="col-md-6"><div class="stat-card"><div class="stat-label">Harian</div><div class="stat-value">Rp 35K</div><div class="text-white-50">1 hari akses penuh</div></div></div>
-        <div class="col-md-6"><div class="stat-card"><div class="stat-label">Mingguan</div><div class="stat-value">Rp 120K</div><div class="text-white-50">7 hari + free cardio plan</div></div></div>
-        <div class="col-md-6"><div class="stat-card"><div class="stat-label">Bulanan</div><div class="stat-value">Rp 350K</div><div class="text-white-50">paling populer</div></div></div>
-        <div class="col-md-6"><div class="stat-card"><div class="stat-label">Tahunan</div><div class="stat-value">Rp 3,2Jt</div><div class="text-white-50">hemat hingga 24%</div></div></div>
+<?php
+/* admin/memberships.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'admin';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Admin';
+
+$pageTitle = 'Membership Packages';
+$topbarTitle = 'Memberships';
+$topbarSubtitle = 'Atur paket membership gym dengan benefit yang jelas dan modern.';
+$searchPlaceholder = 'Cari paket membership...';
+
+include '../includes/layout_top.php';
+
+$packages = [
+  [
+    'name' => 'Basic Monthly',
+    'duration' => '30 Hari',
+    'price' => 'Rp 250.000',
+    'benefit' => 'Akses gym reguler, locker area, konsultasi awal',
+    'status' => 'Active'
+  ],
+  [
+    'name' => 'Premium Plus',
+    'duration' => '90 Hari',
+    'price' => 'Rp 650.000',
+    'benefit' => 'Gym akses penuh, kelas grup, 2x PT session',
+    'status' => 'Active'
+  ],
+  [
+    'name' => 'Fat Loss Plan',
+    'duration' => '60 Hari',
+    'price' => 'Rp 500.000',
+    'benefit' => 'Meal guide, kelas cardio, monitoring mingguan',
+    'status' => 'Active'
+  ],
+  [
+    'name' => 'Student Package',
+    'duration' => '30 Hari',
+    'price' => 'Rp 180.000',
+    'benefit' => 'Akses gym jam tertentu, harga hemat mahasiswa',
+    'status' => 'Inactive'
+  ],
+];
+?>
+
+<section class="page-section">
+  <div class="card-header-inline">
+    <div>
+      <h3 class="section-title">Paket Membership</h3>
+      <p class="section-subtitle">Pilih dan kelola paket yang tersedia untuk member.</p>
+    </div>
+    <a href="#" class="gradient-btn btn-sm">
+      <i class="bi bi-plus-lg"></i> Tambah Paket
+    </a>
+  </div>
+
+  <div class="page-grid grid-2">
+    <?php foreach ($packages as $package): ?>
+      <div class="card-soft">
+        <div class="card-header-inline">
+          <div>
+            <h3 class="section-title"><?= e($package['name']) ?></h3>
+            <p class="section-subtitle"><?= e($package['duration']) ?> • <?= e($package['price']) ?></p>
+          </div>
+          <span class="badge-soft <?= $package['status'] === 'Active' ? 'badge-active' : 'badge-inactive' ?>">
+            <?= e($package['status']) ?>
+          </span>
+        </div>
+
+        <div class="card-list">
+          <div class="list-row">
+            <div>
+              <p class="list-row-title">Benefit Paket</p>
+              <p class="list-row-subtitle"><?= e($package['benefit']) ?></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex align-center gap-8 mt-3">
+          <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-eye"></i> Detail</a>
+          <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
+          <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-trash3"></i> Hapus</a>
+        </div>
       </div>
-    </div>
+    <?php endforeach; ?>
   </div>
-  <div class="col-lg-4">
-    <div class="premium-card h-100">
-      <div class="section-title mb-3">Status Membership</div>
-      <ul class="metric-list list-unstyled mb-0">
-        <li><span>Aktif</span><span class="badge-soft badge-active">1,248</span></li>
-        <li><span>Expired</span><span class="badge-soft badge-expired">74</span></li>
-        <li><span>Pending</span><span class="badge-soft badge-pending">18</span></li>
-      </ul>
-    </div>
-  </div>
-  <div class="col-12">
-    <div class="table-card">
-      <div class="section-title mb-3">Daftar Membership Member</div>
-      <div class="table-responsive"><table class="table table-dark-premium align-middle"><thead><tr><th>Member</th><th>Paket</th><th>Mulai</th><th>Berakhir</th><th>Status</th></tr></thead><tbody><tr><td>Nadia Pratama</td><td>Bulanan</td><td>01-05-2026</td><td>31-05-2026</td><td><span class="badge-soft badge-active">Aktif</span></td></tr><tr><td>Raka Saputra</td><td>Tahunan</td><td>10-01-2026</td><td>10-01-2027</td><td><span class="badge-soft badge-active">Aktif</span></td></tr><tr><td>Dion Putra</td><td>Mingguan</td><td>14-04-2026</td><td>21-04-2026</td><td><span class="badge-soft badge-expired">Expired</span></td></tr></tbody></table></div>
-    </div>
-  </div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>

@@ -1,6 +1,99 @@
-<?php $pageTitle='Check-in | GYMBRUT'; $activePage='checkin'; $topbarTitle='Gym Check-in'; include 'includes/layout_top.php'; ?>
-<div class="row g-4">
-  <div class="col-lg-4"><div class="premium-card text-center h-100"><div class="section-title">Quick Check-in</div><p class="text-white-50 mt-2">Satu tombol untuk check-in member ke gym.</p><button class="gradient-btn mt-4 px-5 py-3" data-toast-trigger><i class="bi bi-geo-alt-fill"></i> Check-in Sekarang</button><div class="progress-ring mt-4"><div class="progress-ring-inner"><strong class="d-block fs-3">184</strong><small class="text-white-50">today</small></div></div></div></div>
-  <div class="col-lg-8"><div class="table-card"><div class="section-title mb-3">History Check-in</div><div class="table-responsive"><table class="table table-dark-premium align-middle"><thead><tr><th>Nama</th><th>Tanggal</th><th>Jam</th><th>Status</th></tr></thead><tbody><tr><td>Raka Saputra</td><td>21-04-2026</td><td>06:12</td><td><span class="badge-soft badge-active">Checked In</span></td></tr><tr><td>Nadia Pratama</td><td>21-04-2026</td><td>17:48</td><td><span class="badge-soft badge-active">Checked In</span></td></tr><tr><td>Farel Wijaya</td><td>21-04-2026</td><td>19:09</td><td><span class="badge-soft badge-active">Checked In</span></td></tr></tbody></table></div></div></div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+<?php
+/* member/checkin.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'member';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Member';
+
+$pageTitle = 'Gym Check In';
+$topbarTitle = 'Check In';
+$topbarSubtitle = 'Pantau status check-in harian dan riwayat kunjungan gym kamu.';
+$searchPlaceholder = 'Cari riwayat check-in...';
+
+include '../includes/layout_top.php';
+
+$todayStatus = 'Belum Check-in';
+$history = [
+  ['date' => '21 Apr 2026', 'time' => '17:42 WIB', 'status' => 'Selesai'],
+  ['date' => '19 Apr 2026', 'time' => '18:03 WIB', 'status' => 'Selesai'],
+  ['date' => '17 Apr 2026', 'time' => '16:55 WIB', 'status' => 'Selesai'],
+  ['date' => '15 Apr 2026', 'time' => '17:18 WIB', 'status' => 'Selesai'],
+];
+?>
+
+<section class="page-section">
+  <div class="page-grid grid-2">
+    <div class="card-soft">
+      <div class="card-header-inline">
+        <div>
+          <h3 class="section-title">Status Hari Ini</h3>
+          <p class="section-subtitle">Silakan lakukan check-in sebelum mulai latihan.</p>
+        </div>
+        <span class="badge-soft badge-pending"><?= e($todayStatus) ?></span>
+      </div>
+
+      <p class="section-subtitle" style="line-height:1.8;">
+        Dengan check-in rutin, kamu bisa memantau konsistensi latihan dan progres kebugaran dengan lebih mudah.
+      </p>
+
+      <div class="mt-3">
+        <button type="button" class="gradient-btn">
+          <i class="bi bi-box-arrow-in-right"></i> Check In Sekarang
+        </button>
+      </div>
+    </div>
+
+    <div class="card-soft">
+      <div class="card-header-inline">
+        <div>
+          <h3 class="section-title">Ringkasan Aktivitas</h3>
+          <p class="section-subtitle">Statistik kehadiran gym bulan ini.</p>
+        </div>
+      </div>
+
+      <div class="page-grid grid-2">
+        <div class="stat-card">
+          <p class="stat-label">Total Check-in</p>
+          <h3 class="stat-value">18x</h3>
+          <div class="stat-meta">Bulan April 2026</div>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Target Bulanan</p>
+          <h3 class="stat-value">20x</h3>
+          <div class="stat-meta">Tinggal 2x lagi</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="card-header-inline">
+      <div>
+        <h3 class="section-title">Riwayat Check-in</h3>
+        <p class="section-subtitle">Daftar kehadiran gym terbaru kamu.</p>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Jam</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($history as $item): ?>
+            <tr>
+              <td><strong><?= e($item['date']) ?></strong></td>
+              <td><?= e($item['time']) ?></td>
+              <td><span class="badge-soft badge-active"><?= e($item['status']) ?></span></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>

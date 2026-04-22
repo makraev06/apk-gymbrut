@@ -1,43 +1,97 @@
 <?php
-require_once 'auth_check.php';
-requireRole(['admin', 'member']);
+/* admin/profile.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'admin';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Admin';
+
+$pageTitle = 'Admin Profile';
+$topbarTitle = 'Profile';
+$topbarSubtitle = 'Informasi akun admin dan identitas pengelola sistem.';
+$searchPlaceholder = 'Cari pengaturan akun...';
+
+include '../includes/layout_top.php';
+
+$profile = [
+  'name' => $_SESSION['name'] ?? 'Michael Admin',
+  'email' => 'admin@gymbrut.com',
+  'role' => 'Administrator',
+  'phone' => '0812-9988-7766',
+  'last_login' => '22 Apr 2026, 19:10 WIB',
+];
 ?>
 
-<?php $pageTitle = 'Profile | GYMBRUT';
-$activePage = 'profile';
-$topbarTitle = 'Profile User';
-include 'includes/layout_top.php'; ?>
-<div class="row g-4">
+<section class="page-section">
+  <div class="page-grid grid-2">
+    <div class="card-soft">
+      <div class="d-flex align-center gap-12 mb-3">
+        <div class="profile-chip-avatar" style="width:64px;height:64px;border-radius:18px;">
+          <?= strtoupper(substr($profile['name'], 0, 1)) ?>
+        </div>
+        <div>
+          <h3 class="section-title mb-0"><?= e($profile['name']) ?></h3>
+          <p class="section-subtitle"><?= e($profile['role']) ?></p>
+        </div>
+      </div>
 
-    
-       
-       
-      
-      
-    
-    <div class="col-lg-4">
-    <div class="premium-car
-      d text-center h-100"><img src="https://ui-avatars
-      .com/api/?name=Soni+Ju
-        liansyah&background=ff7a00&color=fff&size=180" class="rounded-circle mb-3" width="140" height="140"><div class="
-        sectio
-        n-title">Soni Juliansyah</div><p class="text-white-50">Member Premium • Strength Focus</
-p           ><button class="gradient-btn">U
-        pload Foto</button></div></div>
+      <div class="card-list">
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">Email</p>
+            <p class="list-row-subtitle"><?= e($profile['email']) ?></p>
+          </div>
+        </div>
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">No HP</p>
+            <p class="list-row-subtitle"><?= e($profile['phone']) ?></p>
+          </div>
+        </div>
+        <div class="list-row">
+          <div>
+            <p class="list-row-title">Last Login</p>
+            <p class="list-row-subtitle"><?= e($profile['last_login']) ?></p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        
-        
-            
-            
-            
-          
-        
-           
-        
-           
-        
-      
-    
-    <div class="col-lg-8"><div class="form-card"><div class="section-title mb-3">Edit Profil</div><form class="row g-3"><div class="col-md-6"><label class="form-label">Nama</label><input class="form-control" value="Soni Juliansyah"></div><div class="col-md-6"><label class="form-label">Email</label><input class="form-control" value="soni@gymbrut.com"></div><div class="col-md-6"><label class="form-label">No HP</label><input class="form-control" value="081234567890"></div><div class="col-md-6"><label class="form-label">Target</label><select class="form-select"><option>Strength</option><option>Fat Loss</option><option>Bulking</option></select></div><div class="col-md-6"><label class="form-label">Password Baru</label><input type="password" class="form-control" placeholder="••••••••"></div><div class="col-md-6"><label class="form-label">Konfirmasi Password</label><input type="password" class="form-control" placeholder="••••••••"></div><div class="col-12 d-grid"><button type="button" class="gradient-btn py-3">Update Profil</button></div></form></div></div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+    <div class="form-card">
+      <div class="card-header-inline">
+        <div>
+          <h3 class="section-title">Edit Profil</h3>
+          <p class="section-subtitle">Perbarui identitas admin dengan tampilan form yang clean.</p>
+        </div>
+      </div>
+
+      <form class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nama</label>
+          <input type="text" class="form-control" value="<?= e($profile['name']) ?>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" value="<?= e($profile['email']) ?>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <input type="text" class="form-control" value="<?= e($profile['role']) ?>" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">No HP</label>
+          <input type="text" class="form-control" value="<?= e($profile['phone']) ?>">
+        </div>
+
+        <div class="form-group full">
+          <button type="button" class="gradient-btn w-100">
+            <i class="bi bi-check2-circle"></i> Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>

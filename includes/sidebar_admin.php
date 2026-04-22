@@ -1,73 +1,59 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $currentPage = basename($_SERVER['PHP_SELF']);
+$userName = $_SESSION['name'] ?? 'Admin';
+$userRole = 'Administrator';
+
+$menus = [
+    ['file' => 'dashboard.php', 'label' => 'Dashboard', 'icon' => 'bi bi-grid-1x2-fill'],
+    ['file' => 'members.php', 'label' => 'Members', 'icon' => 'bi bi-people-fill'],
+    ['file' => 'memberships.php', 'label' => 'Memberships', 'icon' => 'bi bi-card-checklist'],
+    ['file' => 'payments.php', 'label' => 'Payments', 'icon' => 'bi bi-credit-card-2-front-fill'],
+    ['file' => 'reports.php', 'label' => 'Reports', 'icon' => 'bi bi-bar-chart-fill'],
+    ['file' => 'workouts.php', 'label' => 'Workouts', 'icon' => 'bi bi-fire'],
+    ['file' => 'profile.php', 'label' => 'Profile', 'icon' => 'bi bi-person-circle'],
+];
 ?>
 
-<aside class="sidebar-panel">
-    <div class="brand-box">
-        <div class="brand-icon">
-            <i class="fas fa-dumbbell"></i>
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+            <i class="bi bi-lightning-charge-fill"></i>
         </div>
-        <div>
-            <div class="brand-title">GYMBRUT</div>
-            <div class="brand-subtitle">ADMIN PANEL</div>
+        <div class="sidebar-brand-text">
+            <h2>GYMBRUT</h2>
+            <p>Admin Panel</p>
         </div>
     </div>
 
-    <div class="sidebar-label">MAIN MENU</div>
+    <div class="sidebar-title">Main Menu</div>
 
     <nav class="sidebar-nav">
-        <a href="dashboard.php" class="sidebar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
-            <i class="fas fa-chart-pie"></i>
-            <span>Dashboard</span>
-        </a>
-
-        <a href="members.php" class="sidebar-link <?= $currentPage === 'members.php' ? 'active' : '' ?>">
-            <i class="fas fa-users"></i>
-            <span>Data Member</span>
-        </a>
-
-        <a href="membership.php" class="sidebar-link <?= $currentPage === 'membership.php' ? 'active' : '' ?>">
-            <i class="fas fa-id-card"></i>
-            <span>Membership</span>
-        </a>
-
-        <a href="payments.php" class="sidebar-link <?= $currentPage === 'payments.php' ? 'active' : '' ?>">
-            <i class="fas fa-wallet"></i>
-            <span>Payments</span>
-        </a>
-
-        <a href="profile.php" class="sidebar-link <?= $currentPage === 'profile.php' ? 'active' : '' ?>">
-            <i class="fas fa-user-circle"></i>
-            <span>Profile</span>
-        </a>
-
-        <a href="reports.php" class="sidebar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
-            <i class="fas fa-file-lines"></i>
-            <span>Reports</span>
-        </a>
-
-        <a href="workouts.php" class="sidebar-link <?= $currentPage === 'workouts.php' ? 'active' : '' ?>">
-            <i class="fas fa-dumbbell"></i>
-            <span>Workouts</span>
-        </a>
+        <?php foreach ($menus as $menu): ?>
+            <a href="<?= e($menu['file']) ?>" class="sidebar-link <?= $currentPage === $menu['file'] ? 'active' : '' ?>">
+                <i class="<?= e($menu['icon']) ?>"></i>
+                <span><?= e($menu['label']) ?></span>
+            </a>
+        <?php endforeach; ?>
     </nav>
 
-    <div class="sidebar-label mt-4">ACCOUNT</div>
-
-    <div class="sidebar-user">
-        <div class="d-flex align-items-center gap-3">
-            <div class="sidebar-user-avatar">
-                <?= strtoupper(substr($_SESSION['name'] ?? 'A', 0, 1)); ?>
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                <?= strtoupper(substr($userName, 0, 1)) ?>
             </div>
-            <div>
-                <strong><?= htmlspecialchars($_SESSION['name'] ?? 'Admin'); ?></strong><br>
-                <small>Administrator</small>
+            <div class="sidebar-user-info">
+                <p class="sidebar-user-name"><?= e($userName) ?></p>
+                <p class="sidebar-user-role"><?= e($userRole) ?></p>
             </div>
         </div>
 
-        <a href="../logout.php" class="gradient-btn small-btn sidebar-logout w-100 mt-3">
-            <i class="fas fa-right-from-bracket"></i>
-            Logout
+        <a href="../logout.php" class="gradient-btn sidebar-logout">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
         </a>
     </div>
 </aside>

@@ -1,6 +1,73 @@
-<?php $pageTitle='Payments | GYMBRUT'; $activePage='payments'; $topbarTitle='Pembayaran & Verifikasi'; include 'includes/layout_top.php'; ?>
-<div class="row g-4">
-  <div class="col-xl-7"><div class="table-card"><div class="d-flex justify-content-between mb-3"><div class="section-title">Riwayat Pembayaran</div><button class="gradient-btn" data-toast-trigger>Verifikasi Payment</button></div><div class="table-responsive"><table class="table table-dark-premium align-middle"><thead><tr><th>Invoice</th><th>Member</th><th>Paket</th><th>Nominal</th><th>Status</th></tr></thead><tbody><tr><td>INV-1208</td><td>Nadia Pratama</td><td>Bulanan</td><td>Rp350.000</td><td><span class="badge-soft badge-pending">Pending</span></td></tr><tr><td>INV-1207</td><td>Raka Saputra</td><td>Tahunan</td><td>Rp3.200.000</td><td><span class="badge-soft badge-active">Verified</span></td></tr><tr><td>INV-1206</td><td>Salsa Putri</td><td>Mingguan</td><td>Rp120.000</td><td><span class="badge-soft badge-active">Verified</span></td></tr></tbody></table></div></div></div>
-  <div class="col-xl-5"><div class="form-card"><div class="section-title mb-3">Upload Bukti Bayar</div><div class="upload-box mb-3"><i class="bi bi-cloud-arrow-up fs-1 text-warning"></i><p class="mb-1 mt-2 fw-semibold">Drop file di sini</p><small class="text-white-50">JPG, PNG, atau PDF bukti transfer</small></div><form class="row g-3"><div class="col-12"><input class="form-control" placeholder="Nama member"></div><div class="col-12"><select class="form-select"><option>Pilih paket</option><option>Harian</option><option>Mingguan</option><option>Bulanan</option><option>Tahunan</option></select></div><div class="col-12"><input class="form-control" placeholder="Nominal"></div><div class="col-12 d-grid"><button type="button" class="gradient-btn py-3">Submit Payment</button></div></form></div></div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+<?php
+/* admin/payments.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'admin';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Admin';
+
+$pageTitle = 'Payments';
+$topbarTitle = 'Payments';
+$topbarSubtitle = 'Pantau status pembayaran member dan invoice secara real-time.';
+$searchPlaceholder = 'Cari invoice atau nama member...';
+
+include '../includes/layout_top.php';
+
+$payments = [
+  ['invoice' => 'INV-24081', 'member' => 'Andi Saputra', 'amount' => 'Rp 650.000', 'method' => 'Transfer Bank', 'status' => 'Paid', 'date' => '21 Apr 2026'],
+  ['invoice' => 'INV-24082', 'member' => 'Rina Permata', 'amount' => 'Rp 500.000', 'method' => 'QRIS', 'status' => 'Paid', 'date' => '21 Apr 2026'],
+  ['invoice' => 'INV-24083', 'member' => 'Dimas Pratama', 'amount' => 'Rp 250.000', 'method' => 'Cash', 'status' => 'Pending', 'date' => '20 Apr 2026'],
+  ['invoice' => 'INV-24084', 'member' => 'Salsa Putri', 'amount' => 'Rp 650.000', 'method' => 'Transfer Bank', 'status' => 'Failed', 'date' => '20 Apr 2026'],
+  ['invoice' => 'INV-24085', 'member' => 'Fikri Ramadhan', 'amount' => 'Rp 250.000', 'method' => 'Debit Card', 'status' => 'Paid', 'date' => '19 Apr 2026'],
+];
+?>
+
+<section class="page-section">
+  <div class="table-card">
+    <div class="card-header-inline">
+      <div>
+        <h3 class="section-title">Riwayat Pembayaran</h3>
+        <p class="section-subtitle">Semua transaksi member dalam satu tabel yang rapi.</p>
+      </div>
+      <a href="#" class="gradient-btn btn-sm">
+        <i class="bi bi-download"></i> Export
+      </a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Nama Member</th>
+            <th>Nominal</th>
+            <th>Metode</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($payments as $payment): ?>
+            <tr>
+              <td><strong><?= e($payment['invoice']) ?></strong></td>
+              <td><?= e($payment['member']) ?></td>
+              <td><?= e($payment['amount']) ?></td>
+              <td><?= e($payment['method']) ?></td>
+              <td>
+                <?php
+                $badgeClass = 'badge-pending';
+                if ($payment['status'] === 'Paid')
+                  $badgeClass = 'badge-active';
+                if ($payment['status'] === 'Failed')
+                  $badgeClass = 'badge-failed';
+                ?>
+                <span class="badge-soft <?= $badgeClass ?>"><?= e($payment['status']) ?></span>
+              </td>
+              <td><?= e($payment['date']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>

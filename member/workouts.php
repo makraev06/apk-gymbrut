@@ -1,7 +1,71 @@
-<?php $pageTitle='Workouts | GYMBRUT'; $activePage='workouts'; $topbarTitle='Workout Guide'; include 'includes/layout_top.php'; ?>
-<div class="row g-4">
-  <div class="col-md-6 col-xl-4"><div class="premium-card h-100"><span class="badge-soft badge-expired mb-3 d-inline-block">Fat Loss</span><div class="section-title">HIIT Treadmill</div><p class="text-white-50 mt-2">20 menit interval cardio untuk bakar kalori.</p><ul class="metric-list list-unstyled"><li><span>Sets</span><strong>5</strong></li><li><span>Reps / Time</span><strong>4 menit</strong></li><li><span>Equipment</span><strong>Treadmill</strong></li></ul><div class="ratio ratio-16x9 rounded-4 overflow-hidden"><iframe src="https://www.youtube.com/embed/ml6cT4AZdqI" title="workout"></iframe></div></div></div>
-  <div class="col-md-6 col-xl-4"><div class="premium-card h-100"><span class="badge-soft badge-active mb-3 d-inline-block">Strength</span><div class="section-title">Barbell Bench Press</div><p class="text-white-50 mt-2">Latihan compound untuk chest strength.</p><ul class="metric-list list-unstyled"><li><span>Sets</span><strong>4</strong></li><li><span>Reps</span><strong>8 - 10</strong></li><li><span>Equipment</span><strong>Bench + Barbell</strong></li></ul><div class="ratio ratio-16x9 rounded-4 overflow-hidden"><iframe src="https://www.youtube.com/embed/rT7DgCr-3pg" title="workout"></iframe></div></div></div>
-  <div class="col-md-6 col-xl-4"><div class="premium-card h-100"><span class="badge-soft badge-pending mb-3 d-inline-block">Beginner</span><div class="section-title">Full Body Starter</div><p class="text-white-50 mt-2">Program awal untuk member baru.</p><ul class="metric-list list-unstyled"><li><span>Sets</span><strong>3</strong></li><li><span>Reps</span><strong>12</strong></li><li><span>Equipment</span><strong>Dumbbell</strong></li></ul><div class="ratio ratio-16x9 rounded-4 overflow-hidden"><iframe src="https://www.youtube.com/embed/UItWltVZZmE" title="workout"></iframe></div></div></div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+<?php
+/* member/workouts.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'member';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Member';
+
+$pageTitle = 'Available Workouts';
+$topbarTitle = 'Workout Tersedia';
+$topbarSubtitle = 'Pilih program latihan terbaik sesuai tujuan fitness kamu.';
+$searchPlaceholder = 'Cari workout favoritmu...';
+
+include '../includes/layout_top.php';
+
+$workouts = [
+  [
+    'name' => 'Fat Loss',
+    'desc' => 'Program pembakaran lemak dengan kombinasi HIIT, treadmill, dan circuit training.',
+    'level' => 'Beginner - Intermediate',
+    'duration' => '8 Minggu'
+  ],
+  [
+    'name' => 'Muscle Gain',
+    'desc' => 'Program untuk membangun massa otot secara bertahap dengan fokus hypertrophy.',
+    'level' => 'Intermediate',
+    'duration' => '12 Minggu'
+  ],
+  [
+    'name' => 'Cardio Blast',
+    'desc' => 'Latihan cardio intens untuk meningkatkan stamina dan kesehatan jantung.',
+    'level' => 'All Levels',
+    'duration' => '6 Minggu'
+  ],
+  [
+    'name' => 'Strength Builder',
+    'desc' => 'Latihan kekuatan dengan gerakan compound untuk performa tubuh lebih maksimal.',
+    'level' => 'Intermediate - Advanced',
+    'duration' => '10 Minggu'
+  ],
+];
+?>
+
+<section class="page-section">
+  <div class="page-grid grid-2">
+    <?php foreach ($workouts as $workout): ?>
+      <div class="card-soft">
+        <div class="card-header-inline">
+          <div>
+            <h3 class="section-title"><?= e($workout['name']) ?></h3>
+            <p class="section-subtitle"><?= e($workout['duration']) ?> • <?= e($workout['level']) ?></p>
+          </div>
+          <span class="badge-soft badge-info">Workout</span>
+        </div>
+
+        <p class="section-subtitle" style="margin-top:0; line-height:1.8;">
+          <?= e($workout['desc']) ?>
+        </p>
+
+        <div class="d-flex align-center gap-8 mt-3">
+          <a href="#" class="gradient-btn btn-sm">
+            <i class="bi bi-play-circle"></i> Ikuti Program
+          </a>
+          <a href="#" class="btn-outline-soft btn-sm">
+            <i class="bi bi-eye"></i> Detail
+          </a>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>

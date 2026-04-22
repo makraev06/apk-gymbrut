@@ -1,8 +1,86 @@
-<?php $pageTitle='Reports | GYMBRUT'; $activePage='reports'; $topbarTitle='Reports & Insights'; include 'includes/layout_top.php'; ?>
-<div class="row g-4">
-  <div class="col-xl-4"><div class="stat-card"><div class="stat-label">Laporan Member Aktif</div><div class="stat-value">1,248</div><div class="text-white-50">Mayoritas paket bulanan</div></div></div>
-  <div class="col-xl-4"><div class="stat-card"><div class="stat-label">Laporan Pembayaran</div><div class="stat-value">Rp 92,4Jt</div><div class="text-white-50">Verified 96%</div></div></div>
-  <div class="col-xl-4"><div class="stat-card"><div class="stat-label">Laporan Kehadiran</div><div class="stat-value">83%</div><div class="text-white-50">Stabil minggu ini</div></div></div>
-  <div class="col-12"><div class="table-card"><div class="section-title mb-3">Summary Report</div><div class="table-responsive"><table class="table table-dark-premium"><thead><tr><th>Kategori</th><th>Metrik</th><th>Hasil</th><th>Catatan</th></tr></thead><tbody><tr><td>Member</td><td>Aktif</td><td>1,248</td><td>Naik 14% dari kuartal lalu</td></tr><tr><td>Revenue</td><td>Bulan ini</td><td>Rp 92,4Jt</td><td>Didominasi paket bulanan dan tahunan</td></tr><tr><td>Attendance</td><td>Peak hour</td><td>18:00 - 20:00</td><td>Perlu optimasi area strength</td></tr></tbody></table></div></div></div>
-</div>
-<?php include 'includes/layout_bottom.php'; ?>
+<?php
+/* member/reports.php */
+session_start();
+$_SESSION['role'] = $_SESSION['role'] ?? 'member';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Member';
+
+$pageTitle = 'My Reports';
+$topbarTitle = 'Laporan Aktivitas';
+$topbarSubtitle = 'Ringkasan aktivitas gym dan membership kamu dalam satu tampilan.';
+$searchPlaceholder = 'Cari ringkasan aktivitas...';
+
+include '../includes/layout_top.php';
+?>
+
+<section class="page-section">
+  <div class="page-grid grid-4">
+    <div class="stat-card">
+      <p class="stat-label">Total Check-in</p>
+      <h3 class="stat-value">18x</h3>
+      <div class="stat-meta">Aktif bulan ini</div>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Total Pembayaran</p>
+      <h3 class="stat-value">3x</h3>
+      <div class="stat-meta">Transaksi membership</div>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Progress Latihan</p>
+      <h3 class="stat-value">90%</h3>
+      <div class="stat-meta">Target mingguan tercapai</div>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Membership Aktif</p>
+      <h3 class="stat-value">Premium</h3>
+      <div class="stat-meta">Sisa 69 hari</div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="card-header-inline">
+      <div>
+        <h3 class="section-title">Ringkasan Aktivitas Saya</h3>
+        <p class="section-subtitle">Gambaran singkat performa dan keaktifan gym kamu.</p>
+      </div>
+    </div>
+
+    <div class="card-list">
+      <div class="list-row">
+        <div>
+          <p class="list-row-title">Check-in Paling Aktif</p>
+          <p class="list-row-subtitle">Hari Senin dan Rabu di jam sore</p>
+        </div>
+        <span class="badge-soft badge-info">Kebiasaan</span>
+      </div>
+
+      <div class="list-row">
+        <div>
+          <p class="list-row-title">Pembayaran Terakhir</p>
+          <p class="list-row-subtitle">INV-24081 • Rp 650.000 • 20 Apr 2026</p>
+        </div>
+        <span class="badge-soft badge-active">Lunas</span>
+      </div>
+
+      <div class="list-row">
+        <div>
+          <p class="list-row-title">Program Terbanyak Diikuti</p>
+          <p class="list-row-subtitle">Fat Loss dan Cardio Blast</p>
+        </div>
+        <span class="badge-soft badge-info">Workout</span>
+      </div>
+
+      <div class="list-row">
+        <div>
+          <p class="list-row-title">Catatan Progres</p>
+          <p class="list-row-subtitle">Berat turun 2 kg dalam 6 minggu dengan latihan konsisten.</p>
+        </div>
+        <span class="badge-soft badge-active">Bagus</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php include '../includes/layout_bottom.php'; ?>
