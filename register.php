@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
+<<<<<<< HEAD
     <div class="auth-page">
         <div class="auth-card">
             <div class="auth-logo">
@@ -135,6 +136,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="auth-links">
                 Sudah punya akun?
                 <a href="login.php">Login di sini</a>
+=======
+    <div class="auth-page"> 
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-user-plus"></i>
+            </div>
+
+            <h1 class="auth-title">GYMBRUT</h1>
+            <p class="auth-subtitle">Buat akun baru untuk mulai bergabung</p>
+
+            <?php if (!empty($error)): ?>
+                <div class="auth-alert auth-alert-danger">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="name">Nama Lengkap</label>
+                    <input type="text" id="name" name="name" class="form-control"
+                        placeholder="Masukkan nama lengkap"
+                        value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control"
+                        placeholder="Masukkan email" 
+                        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Nomor HP</label>
+                    <input type="text" id="phone" name="phone" class="form-control"
+                        placeholder="Masukkan nomor HP"
+                        value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Masukkan password" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Konfirmasi Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password"
+                        class="form-control" placeholder="Ulangi password" required>
+                </div>
+
+                <button type="submit" class="gradient-btn w-100">Register</button>
+            </form>
+
+            <div class="auth-links">
+                Sudah punya akun? <a href="login.php">Login sekarang</a>
+>>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
             </div>
         </div>
     </div>

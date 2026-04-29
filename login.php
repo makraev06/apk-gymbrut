@@ -63,7 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
+<<<<<<< HEAD
     <div class="auth-page">
+=======
+    <div class="auth-page"> 
+>>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
         <div class="auth-card">
             <div class="auth-logo">
                 <i class="fas fa-dumbbell"></i>
@@ -87,14 +91,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="auth-form">
                 <div class="form-group">
                     <label class="form-label" for="email">Email</label>
+<<<<<<< HEAD
                     <input type="email" id="email" name="email" class="form-control" placeholder="Masukkan email"
                         value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+=======
+                    <input type="email" id="email" name="email" class="form-control"
+                           placeholder="Masukkan email" 
+                           value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+>>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-control"
+<<<<<<< HEAD
                         placeholder="Masukkan password" required>
+=======
+                           placeholder="Masukkan password" required>
+>>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
                 </div>
 
                 <button type="submit" class="gradient-btn w-100">Login</button>
