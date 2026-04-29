@@ -2,50 +2,54 @@
 session_start();
 require_once 'config/database.php';
 
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'admin') {
+        header('Location: admin/dashboard.php');
+        exit;
+    } elseif ($_SESSION['role'] === 'member') {
+        header('Location: member/dashboard.php');
+        exit;
+    }
+}
+
 $error = '';
+$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $password = trim($_POST['password'] ?? '');
-    $confirm_password = trim($_POST['confirm_password'] ?? '');
+    $confirmPassword = trim($_POST['confirm_password'] ?? '');
 
-    if ($name === '' || $email === '' || $password === '' || $confirm_password === '') {
+    if ($name === '' || $email === '' || $phone === '' || $password === '' || $confirmPassword === '') {
         $error = 'Semua field wajib diisi.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Format email tidak valid.';
-    } elseif ($password !== $confirm_password) {
-        $error = 'Konfirmasi password tidak cocok.';
+    } elseif ($password !== $confirmPassword) {
+        $error = 'Konfirmasi password tidak sama.';
     } else {
-        $check = $conn->prepare("SELECT user_id FROM users WHERE email = ? LIMIT 1");
-        $check->bind_param("s", $email);
-        $check->execute();
-        $result = $check->get_result();
+        $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ? LIMIT 1");
+        mysqli_stmt_bind_param($checkStmt, "s", $email);
+        mysqli_stmt_execute($checkStmt);
+        $checkResult = mysqli_stmt_get_result($checkStmt);
 
-        if ($result->num_rows > 0) {
+        if (mysqli_fetch_assoc($checkResult)) {
             $error = 'Email sudah terdaftar.';
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            /* 
-               Karena role di database Anda adalah enum('admin','member'),
-               maka default register dibuat menjadi member
-            */
             $role = 'member';
 
-            $stmt = $conn->prepare("
-                INSERT INTO users (name, email, phone, password, role)
-                VALUES (?, ?, ?, ?, ?)
-            ");
-            $stmt->bind_param("sssss", $name, $email, $phone, $hashedPassword, $role);
+            $insertStmt = mysqli_prepare(
+                $conn,
+                "INSERT INTO users (name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)"
+            );
+            mysqli_stmt_bind_param($insertStmt, "sssss", $name, $email, $phone, $hashedPassword, $role);
 
-            if ($stmt->execute()) {
-                $_SESSION['success_register'] = 'Registrasi berhasil. Silakan login.';
-                header("Location: login.php");
-                exit;
+            if (mysqli_stmt_execute($insertStmt)) {
+                $success = 'Registrasi berhasil. Silakan login.';
             } else {
-                $error = 'Registrasi gagal. Coba lagi.';
+                $error = 'Registrasi gagal. Cek struktur tabel users.';
             }
         }
     }
@@ -57,100 +61,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Gymbrut</title>
+    <title>Register - GYMBRUT</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/theme.css?v=registerfix1">
 </head>
 
 <body>
-    <div class="auth-shell simple-auth">
-        <div class="auth-card simple-auth-card">
-            <div class="auth-right">
-                <div class="simple-auth-box">
-                    <div class="simple-auth-logo"></div>
+    <div class="auth-page">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
 
-                    <h1 class="simple-auth-brand">GYMBRUT</h1>
-                    <p class="simple-auth-subtitle">Buat akun baru untuk mulai bergabung</p>
+            <h1 class="auth-title">Buat Akun</h1>
+            <p class="auth-subtitle">
+                Daftar sebagai member GYMBRUT untuk mulai mengakses fitur gym management.
+            </p>
 
-                    <?php if (!empty($error)): ?>
-                        <div class="auth-alert auth-alert-danger">
-                            <?= htmlspecialchars($error) ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <form method="POST" class="simple-auth-form">
-                        <div class="form-group">
-                            <label class="form-label" for="name">Nama Lengkap</label>
-                            <div class="simple-input-wrap">
-                                <i class="fas fa-user"></i>
-                                <input type="text" id="name" name="name" class="form-control"
-                                    placeholder="Masukkan nama lengkap"
-                                    value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="email">Email</label>
-                            <div class="simple-input-wrap">
-                                <i class="far fa-envelope"></i>
-                                <input type="email" id="email" name="email" class="form-control"
-                                    placeholder="Masukkan email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                                    required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="phone">Nomor HP</label>
-                            <div class="simple-input-wrap">
-                                <i class="fas fa-phone"></i>
-                                <input type="text" id="phone" name="phone" class="form-control"
-                                    placeholder="Masukkan nomor HP"
-                                    value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="password">Password</label>
-                            <div class="simple-input-wrap">
-                                <i class="fas fa-lock"></i>
-                                <input type="password" id="password" name="password" class="form-control"
-                                    placeholder="Masukkan password" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="confirm_password">Konfirmasi Password</label>
-                            <div class="simple-input-wrap">
-                                <i class="fas fa-lock"></i>
-                                <input type="password" id="confirm_password" name="confirm_password"
-                                    class="form-control" placeholder="Ulangi password" required>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="gradient-btn">Register</button>
-                    </form>
-
-                    <div class="simple-auth-links">
-                        Sudah punya akun? <a href="login.php">Login sekarang</a>
-                    </div>
-
-                    <div class="simple-auth-footer">
-                        <div class="simple-auth-footer-links">
-                            <a href="#">Privacy Policy</a>
-                            <a href="#">Terms of Service</a>
-                            <a href="#">Support</a>
-                        </div>
-
-                        <div class="simple-auth-version">V2.4.1 Secure Access</div>
-                    </div>
+            <?php if ($error !== ''): ?>
+                <div class="auth-alert auth-alert-danger">
+                    <?= e($error) ?>
                 </div>
+            <?php endif; ?>
+
+            <?php if ($success !== ''): ?>
+                <div class="auth-alert auth-alert-success">
+                    <?= e($success) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" name="name" class="form-control" placeholder="Masukkan nama lengkap"
+                        value="<?= e($_POST['name'] ?? '') ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="Masukkan email"
+                        value="<?= e($_POST['email'] ?? '') ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">No. HP</label>
+                    <input type="text" name="phone" class="form-control" placeholder="Masukkan nomor HP"
+                        value="<?= e($_POST['phone'] ?? '') ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Masukkan password"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Konfirmasi Password</label>
+                    <input type="password" name="confirm_password" class="form-control" placeholder="Ulangi password"
+                        required>
+                </div>
+
+                <button type="submit" class="gradient-btn w-100">
+                    <i class="bi bi-person-check-fill"></i>
+                    Daftar
+                </button>
+            </form>
+
+            <div class="auth-links">
+                Sudah punya akun?
+                <a href="login.php">Login di sini</a>
             </div>
         </div>
     </div>

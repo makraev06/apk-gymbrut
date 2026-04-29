@@ -11,13 +11,23 @@ $searchPlaceholder = 'Cari nama member atau email...';
 
 include '../includes/layout_top.php';
 
-$members = [
-  ['name' => 'Andi Saputra', 'email' => 'andi@email.com', 'phone' => '0812-3344-5566', 'package' => 'Premium Plus', 'join' => '12 Jan 2026', 'status' => 'Active'],
-  ['name' => 'Rina Permata', 'email' => 'rina@email.com', 'phone' => '0813-7777-4455', 'package' => 'Fat Loss Plan', 'join' => '20 Jan 2026', 'status' => 'Active'],
-  ['name' => 'Dimas Pratama', 'email' => 'dimas@email.com', 'phone' => '0822-1234-5678', 'package' => 'Basic Monthly', 'join' => '05 Feb 2026', 'status' => 'Pending'],
-  ['name' => 'Salsa Putri', 'email' => 'salsa@email.com', 'phone' => '0819-8745-3321', 'package' => 'Strength Builder', 'join' => '18 Feb 2026', 'status' => 'Active'],
-  ['name' => 'Fikri Ramadhan', 'email' => 'fikri@email.com', 'phone' => '0852-9000-8821', 'package' => 'Premium Plus', 'join' => '03 Mar 2026', 'status' => 'Inactive'],
-];
+$members = gymbrut_query_all($conn, "
+  SELECT 
+    u.user_id,
+    u.name,
+    u.email,
+    u.phone,
+    u.created_at,
+    mp.package_name,
+    m.start_date,
+    m.end_date,
+    m.status
+  FROM users u
+  LEFT JOIN memberships m ON u.user_id = m.user_id
+  LEFT JOIN membership_packages mp ON m.package_id = mp.package_id
+  WHERE u.role = 'member'
+  ORDER BY u.user_id DESC
+");
 ?>
 
 <section class="page-section">
@@ -52,28 +62,43 @@ $members = [
             <tr>
               <td><strong><?= e($member['name']) ?></strong></td>
               <td><?= e($member['email']) ?></td>
-              <td><?= e($member['phone']) ?></td>
-              <td><?= e($member['package']) ?></td>
-              <td><?= e($member['join']) ?></td>
+              <td><?= e($member['phone'] ?? '-') ?></td>
+              <td><?= e($member['package_name'] ?? 'Belum pilih paket') ?></td>
+              <td>
+                <?= !empty($member['start_date'])
+                  ? date('d M Y', strtotime($member['start_date']))
+                  : date('d M Y', strtotime($member['created_at'])) ?>
+              </td>
               <td>
                 <?php
-                $badgeClass = 'badge-active';
-                if ($member['status'] === 'Pending')
-                  $badgeClass = 'badge-pending';
-                if ($member['status'] === 'Inactive')
-                  $badgeClass = 'badge-inactive';
+                $status = $member['status'] ?? 'pending';
+
+                $badgeClass = 'badge-pending';
+                if ($status === 'aktif')
+                  $badgeClass = 'badge-active';
+                if ($status === 'expired')
+                  $badgeClass = 'badge-expired';
                 ?>
-                <span class="badge-soft <?= $badgeClass ?>"><?= e($member['status']) ?></span>
+                <span class="badge-soft <?= $badgeClass ?>">
+                  <?= e(ucfirst($status)) ?>
+                </span>
               </td>
               <td class="text-end">
                 <div class="d-flex align-center justify-between gap-8" style="justify-content:flex-end;">
-                  <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-eye"></i> Detail</a>
-                  <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-pencil-square"></i> Edit</a>
-                  <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-trash3"></i> Hapus</a>
+                  <a href="#" class="btn-outline-soft btn-sm">
+                    <i class="bi bi-eye"></i> Detail
+                  </a>
+                  <a href="#" class="btn-outline-soft btn-sm">
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </a>
+                  <a href="#" class="btn-outline-soft btn-sm">
+                    <i class="bi bi-trash3"></i> Hapus
+                  </a>
                 </div>
               </td>
             </tr>
           <?php endforeach; ?>
+
         </tbody>
       </table>
     </div>

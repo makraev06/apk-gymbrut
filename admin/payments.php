@@ -1,8 +1,6 @@
 <?php
 /* admin/payments.php */
 session_start();
-$_SESSION['role'] = $_SESSION['role'] ?? 'admin';
-$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Admin';
 
 $pageTitle = 'Payments';
 $topbarTitle = 'Payments';
@@ -11,13 +9,21 @@ $searchPlaceholder = 'Cari invoice atau nama member...';
 
 include '../includes/layout_top.php';
 
-$payments = [
-  ['invoice' => 'INV-24081', 'member' => 'Andi Saputra', 'amount' => 'Rp 650.000', 'method' => 'Transfer Bank', 'status' => 'Paid', 'date' => '21 Apr 2026'],
-  ['invoice' => 'INV-24082', 'member' => 'Rina Permata', 'amount' => 'Rp 500.000', 'method' => 'QRIS', 'status' => 'Paid', 'date' => '21 Apr 2026'],
-  ['invoice' => 'INV-24083', 'member' => 'Dimas Pratama', 'amount' => 'Rp 250.000', 'method' => 'Cash', 'status' => 'Pending', 'date' => '20 Apr 2026'],
-  ['invoice' => 'INV-24084', 'member' => 'Salsa Putri', 'amount' => 'Rp 650.000', 'method' => 'Transfer Bank', 'status' => 'Failed', 'date' => '20 Apr 2026'],
-  ['invoice' => 'INV-24085', 'member' => 'Fikri Ramadhan', 'amount' => 'Rp 250.000', 'method' => 'Debit Card', 'status' => 'Paid', 'date' => '19 Apr 2026'],
-];
+$payments = gymbrut_query_all($conn, "
+  SELECT
+    p.payment_id,
+    p.amount,
+    p.payment_date,
+    p.proof_file,
+    p.status,
+    u.name AS member_name,
+    mp.package_name
+  FROM payments p
+  JOIN memberships m ON p.membership_id = m.membership_id
+  JOIN users u ON m.user_id = u.user_id
+  JOIN membership_packages mp ON m.package_id = mp.package_id
+  ORDER BY p.payment_date DESC
+");
 ?>
 
 <section class="page-section">
@@ -25,8 +31,9 @@ $payments = [
     <div class="card-header-inline">
       <div>
         <h3 class="section-title">Riwayat Pembayaran</h3>
-        <p class="section-subtitle">Semua transaksi member dalam satu tabel yang rapi.</p>
+        <p class="section-subtitle">Data pembayaran langsung dari database.</p>
       </div>
+
       <a href="#" class="gradient-btn btn-sm">
         <i class="bi bi-download"></i> Export
       </a>
@@ -38,30 +45,55 @@ $payments = [
           <tr>
             <th>Invoice</th>
             <th>Nama Member</th>
+            <th>Paket</th>
             <th>Nominal</th>
-            <th>Metode</th>
+            <th>Bukti</th>
             <th>Status</th>
             <th>Tanggal</th>
           </tr>
         </thead>
+
         <tbody>
-          <?php foreach ($payments as $payment): ?>
+          <?php if (empty($payments)): ?>
             <tr>
-              <td><strong><?= e($payment['invoice']) ?></strong></td>
-              <td><?= e($payment['member']) ?></td>
-              <td><?= e($payment['amount']) ?></td>
-              <td><?= e($payment['method']) ?></td>
+              <td colspan="7" class="text-soft">Belum ada data pembayaran.</td>
+            </tr>
+          <?php endif; ?>
+
+          <?php foreach ($payments as $payment): ?>
+            <?php
+            $badgeClass = 'badge-pending';
+
+            if ($payment['status'] === 'verified') {
+              $badgeClass = 'badge-active';
+            }
+
+            if ($payment['status'] === 'rejected') {
+              $badgeClass = 'badge-failed';
+            }
+            ?>
+
+            <tr>
+              <td><strong>INV-<?= str_pad($payment['payment_id'], 5, '0', STR_PAD_LEFT) ?></strong></td>
+              <td><?= e($payment['member_name']) ?></td>
+              <td><?= e($payment['package_name']) ?></td>
+              <td>Rp <?= number_format($payment['amount'], 0, ',', '.') ?></td>
               <td>
-                <?php
-                $badgeClass = 'badge-pending';
-                if ($payment['status'] === 'Paid')
-                  $badgeClass = 'badge-active';
-                if ($payment['status'] === 'Failed')
-                  $badgeClass = 'badge-failed';
-                ?>
-                <span class="badge-soft <?= $badgeClass ?>"><?= e($payment['status']) ?></span>
+                <?php if (!empty($payment['proof_file'])): ?>
+                  <a href="../uploads/payments/<?= e($payment['proof_file']) ?>" target="_blank"
+                    class="btn-outline-soft btn-sm">
+                    <i class="bi bi-image"></i> Lihat
+                  </a>
+                <?php else: ?>
+                  <span class="text-soft">-</span>
+                <?php endif; ?>
               </td>
-              <td><?= e($payment['date']) ?></td>
+              <td>
+                <span class="badge-soft <?= $badgeClass ?>">
+                  <?= e(ucfirst($payment['status'])) ?>
+                </span>
+              </td>
+              <td><?= date('d M Y', strtotime($payment['payment_date'])) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
