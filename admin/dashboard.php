@@ -96,7 +96,9 @@ if (empty($chartLabels)) {
 
     <div class="dashboard-hero-card">
         <span>Pendapatan bulan ini</span>
-        <strong>Rp <?= number_format($income, 0, ',', '.') ?></strong>
+        <strong>Rp
+            <?= number_format($income, 0, ',', '.') ?>
+        </strong>
         <small>Dari pembayaran verified</small>
     </div>
 </div>
@@ -106,7 +108,9 @@ if (empty($chartLabels)) {
         <div class="stat-card stat-card-modern">
             <div>
                 <p class="stat-label">Total Member</p>
-                <h3 class="stat-value"><?= number_format($stats['total_member']) ?></h3>
+                <h3 class="stat-value">
+                    <?= number_format($stats['total_member']) ?>
+                </h3>
                 <span class="stat-meta">Semua akun member</span>
             </div>
             <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
@@ -117,7 +121,9 @@ if (empty($chartLabels)) {
         <div class="stat-card stat-card-modern">
             <div>
                 <p class="stat-label">Member Aktif</p>
-                <h3 class="stat-value"><?= number_format($stats['active_member']) ?></h3>
+                <h3 class="stat-value">
+                    <?= number_format($stats['active_member']) ?>
+                </h3>
                 <span class="stat-meta">Membership status aktif</span>
             </div>
             <div class="stat-icon"><i class="bi bi-person-check-fill"></i></div>
@@ -128,7 +134,9 @@ if (empty($chartLabels)) {
         <div class="stat-card stat-card-modern">
             <div>
                 <p class="stat-label">Pending Payment</p>
-                <h3 class="stat-value"><?= number_format($stats['pending_payment']) ?></h3>
+                <h3 class="stat-value">
+                    <?= number_format($stats['pending_payment']) ?>
+                </h3>
                 <span class="stat-meta">Menunggu verifikasi</span>
             </div>
             <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
@@ -139,7 +147,9 @@ if (empty($chartLabels)) {
         <div class="stat-card stat-card-modern">
             <div>
                 <p class="stat-label">Workout Program</p>
-                <h3 class="stat-value"><?= number_format($stats['total_workout']) ?></h3>
+                <h3 class="stat-value">
+                    <?= number_format($stats['total_workout']) ?>
+                </h3>
                 <span class="stat-meta">Program tersedia</span>
             </div>
             <div class="stat-icon"><i class="bi bi-activity"></i></div>
@@ -171,19 +181,27 @@ if (empty($chartLabels)) {
             <ul class="metric-list">
                 <li>
                     <span>Check-in hari ini</span>
-                    <strong><?= number_format($todayCheckin) ?> orang</strong>
+                    <strong>
+                        <?= number_format($todayCheckin) ?> orang
+                    </strong>
                 </li>
                 <li>
                     <span>Paket populer</span>
-                    <strong><?= e($popularPackage) ?></strong>
+                    <strong>
+                        <?= e($popularPackage) ?>
+                    </strong>
                 </li>
                 <li>
                     <span>Membership hampir habis</span>
-                    <strong><?= number_format($expiringSoon) ?> akun</strong>
+                    <strong>
+                        <?= number_format($expiringSoon) ?> akun
+                    </strong>
                 </li>
                 <li>
                     <span>Pembayaran pending</span>
-                    <strong><?= number_format($stats['pending_payment']) ?> transaksi</strong>
+                    <strong>
+                        <?= number_format($stats['pending_payment']) ?> transaksi
+                    </strong>
                 </li>
             </ul>
         </div>
@@ -203,8 +221,12 @@ if (empty($chartLabels)) {
                 <?php foreach ($recentMembers as $member): ?>
                     <div class="list-row">
                         <div>
-                            <p class="list-row-title"><?= e($member['name']) ?></p>
-                            <p class="list-row-subtitle"><?= e($member['email']) ?></p>
+                            <p class="list-row-title">
+                                <?= e($member['name']) ?>
+                            </p>
+                            <p class="list-row-subtitle">
+                                <?= e($member['email']) ?>
+                            </p>
                         </div>
                         <span class="badge-soft badge-active">
                             <?= date('d M Y', strtotime($member['created_at'])) ?>
@@ -235,9 +257,12 @@ if (empty($chartLabels)) {
 
                     <div class="list-row">
                         <div>
-                            <p class="list-row-title"><?= e($payment['name']) ?></p>
+                            <p class="list-row-title">
+                                <?= e($payment['name']) ?>
+                            </p>
                             <p class="list-row-subtitle">
-                                Rp <?= number_format($payment['amount'], 0, ',', '.') ?>
+                                Rp
+                                <?= number_format($payment['amount'], 0, ',', '.') ?>
                             </p>
                         </div>
                         <span class="badge-soft <?= $badge ?>">

@@ -18,8 +18,8 @@ $basePath = ($currentDir === 'admin' || $currentDir === 'member') ? '../' : '';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-    <link rel="stylesheet" href="<?= $basePath ?>assets/css/theme.css?v=100">
-    <link rel="stylesheet" href="<?= $basePath ?>assets/css/sidebar.css?v=100">
-    <link rel="stylesheet" href="<?= $basePath ?>assets/css/topbar.css?v=100">
-    <link rel="stylesheet" href="<?= $basePath ?>assets/css/auth.css?v=100">
+    <link rel="stylesheet" href="/rpl-web/assets/css/theme.css">
+    <link rel="stylesheet" href="/rpl-web/assets/css/sidebar.css">
+    <link rel="stylesheet" href="/rpl-web/assets/css/topbar.css">
+    <link rel="stylesheet" href="/rpl-web/assets/css/auth.css">
 </head>

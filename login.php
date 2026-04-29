@@ -16,16 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
         $stmt->bind_param("s", $email);
         $stmt->execute();
+
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
 
         if ($user && (password_verify($password, $user['password']) || $password === $user['password'])) {
-            $role = strtolower($user['role'] ?? 'user');
-
-            // Kalau di database masih pakai "member", samakan ke "user"
-            if ($role === 'member') {
-                $role = 'user';
-            }
+            $role = strtolower($user['role'] ?? 'member');
 
             $_SESSION['user_id'] = $user['user_id'] ?? $user['id'] ?? null;
             $_SESSION['name'] = $user['name'] ?? '';
@@ -44,37 +40,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Gymbrut</title>
+    <title>Login - GYMBRUT</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="assets\css\theme.css">
+
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
 </head>
 
 <body>
-<<<<<<< HEAD
     <div class="auth-page">
-=======
-    <div class="auth-page"> 
->>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
         <div class="auth-card">
             <div class="auth-logo">
                 <i class="fas fa-dumbbell"></i>
             </div>
 
             <h1 class="auth-title">GYMBRUT</h1>
-            <p class="auth-subtitle">Sistem Login Fitness &amp; Gym Management</p>
+            <p class="auth-subtitle">Login ke sistem fitness & gym management</p>
 
             <?php if (!empty($error)): ?>
                 <div class="auth-alert auth-alert-danger">
@@ -91,27 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" class="auth-form">
                 <div class="form-group">
                     <label class="form-label" for="email">Email</label>
-<<<<<<< HEAD
                     <input type="email" id="email" name="email" class="form-control" placeholder="Masukkan email"
                         value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
-=======
-                    <input type="email" id="email" name="email" class="form-control"
-                           placeholder="Masukkan email" 
-                           value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
->>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-control"
-<<<<<<< HEAD
                         placeholder="Masukkan password" required>
-=======
-                           placeholder="Masukkan password" required>
->>>>>>> 5533a06d7598b9ce31bde0f7a8191ad1e73b4446
                 </div>
 
-                <button type="submit" class="gradient-btn w-100">Login</button>
+                <button type="submit" class="gradient-btn w-100">
+                    Login
+                </button>
             </form>
 
             <div class="auth-links">

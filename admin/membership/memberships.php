@@ -7,7 +7,7 @@ $topbarTitle = 'Memberships';
 $topbarSubtitle = 'Atur paket membership gym dengan benefit yang jelas dan modern.';
 $searchPlaceholder = 'Cari paket membership...';
 
-include '../includes/layout_top.php';
+include '../../includes/layout_top.php';
 
 $packages = gymbrut_query_all($conn, "
   SELECT 
@@ -28,7 +28,7 @@ $packages = gymbrut_query_all($conn, "
       <p class="section-subtitle">Pilih dan kelola paket yang tersedia untuk member.</p>
     </div>
 
-    <a href="#" class="gradient-btn btn-sm">
+    <a href="addMembership.php" class="gradient-btn btn-sm">
       <i class="bi bi-plus-lg"></i> Tambah Paket
     </a>
   </div>
@@ -65,13 +65,12 @@ $packages = gymbrut_query_all($conn, "
           </div>
 
           <div class="d-flex align-center gap-8 mt-3">
-            <a href="#" class="btn-outline-soft btn-sm">
-              <i class="bi bi-eye"></i> Detail
-            </a>
-            <a href="#" class="btn-outline-soft btn-sm">
+            <a href="editMembership.php?id=<?= e($package['package_id']) ?>" class="btn-outline-soft btn-sm">
               <i class="bi bi-pencil-square"></i> Edit
             </a>
-            <a href="#" class="btn-outline-soft btn-sm">
+
+            <a href="deleteMembership.php?id=<?= e($package['package_id']) ?>" class="btn-outline-soft btn-sm"
+              onclick="return confirm('Yakin ingin menghapus paket ini?')">
               <i class="bi bi-trash3"></i> Hapus
             </a>
           </div>
@@ -81,4 +80,4 @@ $packages = gymbrut_query_all($conn, "
   <?php endif; ?>
 </section>
 
-<?php include '../includes/layout_bottom.php'; ?>
+<?php include '../../includes/layout_bottom.php'; ?>

@@ -3,22 +3,64 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$currentPage = basename($_SERVER['PHP_SELF']);
+$currentPath = $_SERVER['REQUEST_URI'] ?? '';
+
 $userName = $_SESSION['name'] ?? 'Admin';
 $userRole = 'Administrator';
 
+/* BASE URL PROJECT */
+$base = '/rpl-web';
+
+/* MENU */
 $menus = [
-    ['file' => 'dashboard.php', 'label' => 'Dashboard', 'icon' => 'bi bi-grid-1x2-fill'],
-    ['file' => 'members.php', 'label' => 'Members', 'icon' => 'bi bi-people-fill'],
-    ['file' => 'memberships.php', 'label' => 'Memberships', 'icon' => 'bi bi-card-checklist'],
-    ['file' => 'payments.php', 'label' => 'Payments', 'icon' => 'bi bi-credit-card-2-front-fill'],
-    ['file' => 'reports.php', 'label' => 'Reports', 'icon' => 'bi bi-bar-chart-fill'],
-    ['file' => 'workouts.php', 'label' => 'Workouts', 'icon' => 'bi bi-fire'],
-    ['file' => 'profile.php', 'label' => 'Profile', 'icon' => 'bi bi-person-circle'],
+    [
+        'url' => $base . '/admin/dashboard.php',
+        'key' => '/admin/dashboard.php',
+        'label' => 'Dashboard',
+        'icon' => 'bi bi-grid-1x2-fill'
+    ],
+    [
+        'url' => $base . '/admin/member/members.php',
+        'key' => '/admin/member/',
+        'label' => 'Members',
+        'icon' => 'bi bi-people-fill'
+    ],
+    [
+        'url' => $base . '/admin/membership/memberships.php',
+        'key' => '/admin/membership/',
+        'label' => 'Memberships',
+        'icon' => 'bi bi-card-checklist'
+    ],
+    [
+        'url' => $base . '/admin/payments.php',
+        'key' => '/admin/payments.php',
+        'label' => 'Payments',
+        'icon' => 'bi bi-credit-card-2-front-fill'
+    ],
+    [
+        'url' => $base . '/admin/reports.php',
+        'key' => '/admin/reports.php',
+        'label' => 'Reports',
+        'icon' => 'bi bi-bar-chart-fill'
+    ],
+    [
+        'url' => $base . '/admin/workout/workouts.php',
+        'key' => '/admin/workout/',
+        'label' => 'Workouts',
+        'icon' => 'bi bi-fire'
+    ],
+    [
+        'url' => $base . '/admin/profile.php',
+        'key' => '/admin/profile.php',
+        'label' => 'Profile',
+        'icon' => 'bi bi-person-circle'
+    ],
 ];
 ?>
 
 <aside class="sidebar">
+
+    <!-- LOGO -->
     <div class="sidebar-brand">
         <div class="sidebar-brand-logo">
             <i class="bi bi-lightning-charge-fill"></i>
@@ -31,29 +73,37 @@ $menus = [
 
     <div class="sidebar-title">Main Menu</div>
 
+    <!-- MENU -->
     <nav class="sidebar-nav">
         <?php foreach ($menus as $menu): ?>
-            <a href="<?= e($menu['file']) ?>" class="sidebar-link <?= $currentPage === $menu['file'] ? 'active' : '' ?>">
-                <i class="<?= e($menu['icon']) ?>"></i>
-                <span><?= e($menu['label']) ?></span>
+            <?php $active = strpos($currentPath, $menu['key']) !== false; ?>
+
+            <a href="<?= htmlspecialchars($menu['url']) ?>" class="sidebar-link <?= $active ? 'active' : '' ?>">
+
+                <i class="<?= htmlspecialchars($menu['icon']) ?>"></i>
+                <span><?= htmlspecialchars($menu['label']) ?></span>
             </a>
         <?php endforeach; ?>
     </nav>
 
+    <!-- FOOTER -->
     <div class="sidebar-footer">
         <div class="sidebar-user">
             <div class="sidebar-avatar">
                 <?= strtoupper(substr($userName, 0, 1)) ?>
             </div>
+
             <div class="sidebar-user-info">
-                <p class="sidebar-user-name"><?= e($userName) ?></p>
-                <p class="sidebar-user-role"><?= e($userRole) ?></p>
+                <p class="sidebar-user-name"><?= htmlspecialchars($userName) ?></p>
+                <p class="sidebar-user-role"><?= htmlspecialchars($userRole) ?></p>
             </div>
         </div>
 
-        <a href="../logout.php" class="gradient-btn sidebar-logout">
+        <!-- LOGOUT -->
+        <a href="<?= $base ?>/logout.php" class="gradient-btn sidebar-logout">
             <i class="bi bi-box-arrow-right"></i>
             <span>Logout</span>
         </a>
     </div>
+
 </aside>

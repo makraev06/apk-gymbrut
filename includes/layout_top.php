@@ -5,9 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../config/database.php';
 
-$currentFolder = basename(dirname($_SERVER['PHP_SELF']));
-$isAdminPage = ($currentFolder === 'admin');
-$isMemberPage = ($currentFolder === 'member');
+$requestUri = $_SERVER['REQUEST_URI'];
+
+$isAdminPage = strpos($requestUri, '/admin/') !== false;
+$isMemberPage = strpos($requestUri, '/member/') !== false;
 
 if ($isAdminPage) {
     require_once __DIR__ . '/auth_admin.php';

@@ -7,7 +7,7 @@ $topbarTitle = 'Workouts';
 $topbarSubtitle = 'Kelola program latihan yang tersedia untuk seluruh member gym.';
 $searchPlaceholder = 'Cari program workout...';
 
-include '../includes/layout_top.php';
+include '../../includes/layout_top.php';
 
 $workouts = gymbrut_query_all($conn, "
   SELECT
@@ -32,7 +32,7 @@ $workouts = gymbrut_query_all($conn, "
       <p class="section-subtitle">Program latihan modern yang bisa dipilih sesuai tujuan fitness.</p>
     </div>
 
-    <a href="#" class="gradient-btn btn-sm">
+    <a href="addWorkouts.php" class="gradient-btn btn-sm">
       <i class="bi bi-plus-lg"></i> Tambah Program
     </a>
   </div>
@@ -103,4 +103,4 @@ $workouts = gymbrut_query_all($conn, "
   <?php endif; ?>
 </section>
 
-<?php include '../includes/layout_bottom.php'; ?>
+<?php include '../../includes/layout_bottom.php'; ?>

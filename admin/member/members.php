@@ -9,7 +9,7 @@ $topbarTitle = 'Members';
 $topbarSubtitle = 'Kelola seluruh data member gym secara rapi dan terstruktur.';
 $searchPlaceholder = 'Cari nama member atau email...';
 
-include '../includes/layout_top.php';
+include '../../includes/layout_top.php';
 
 $members = gymbrut_query_all($conn, "
   SELECT 
@@ -40,7 +40,9 @@ $members = gymbrut_query_all($conn, "
 
       <div class="d-flex align-center gap-8">
         <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-funnel"></i> Filter</a>
-        <a href="#" class="gradient-btn btn-sm"><i class="bi bi-plus-lg"></i> Tambah Member</a>
+        <a href="addMember.php" class="gradient-btn btn-sm">
+          <i class="bi bi-plus-lg"></i> Tambah Member
+        </a>
       </div>
     </div>
 
@@ -85,13 +87,12 @@ $members = gymbrut_query_all($conn, "
               </td>
               <td class="text-end">
                 <div class="d-flex align-center justify-between gap-8" style="justify-content:flex-end;">
-                  <a href="#" class="btn-outline-soft btn-sm">
-                    <i class="bi bi-eye"></i> Detail
-                  </a>
-                  <a href="#" class="btn-outline-soft btn-sm">
+                  <a href="editMember.php?id=<?= e($member['user_id']) ?>" class="btn-outline-soft btn-sm">
                     <i class="bi bi-pencil-square"></i> Edit
                   </a>
-                  <a href="#" class="btn-outline-soft btn-sm">
+
+                  <a href="deleteMember.php?id=<?= e($member['user_id']) ?>" class="btn-outline-soft btn-sm"
+                    onclick="return confirm('Yakin ingin menghapus member ini?')">
                     <i class="bi bi-trash3"></i> Hapus
                   </a>
                 </div>
@@ -105,4 +106,4 @@ $members = gymbrut_query_all($conn, "
   </div>
 </section>
 
-<?php include '../includes/layout_bottom.php'; ?>
+<?php include '../../includes/layout_bottom.php'; ?>
