@@ -11,11 +11,26 @@ $searchPlaceholder = 'Cari invoice pembayaran...';
 
 include '../includes/layout_top.php';
 
-$payments = [
-  ['invoice' => 'INV-24081', 'amount' => 'Rp 650.000', 'status' => 'Paid', 'date' => '20 Apr 2026'],
-  ['invoice' => 'INV-23890', 'amount' => 'Rp 650.000', 'status' => 'Paid', 'date' => '20 Mar 2026'],
-  ['invoice' => 'INV-23644', 'amount' => 'Rp 500.000', 'status' => 'Pending', 'date' => '18 Feb 2026'],
-];
+$userId = (int) $_SESSION['user_id'];
+
+$userId = (int) $_SESSION['user_id'];
+
+$payments = gymbrut_query_all($conn, "
+  SELECT
+    p.payment_id,
+    p.amount,
+    p.status,
+    p.payment_date,
+    p.proof_file,
+    mp.package_name,
+    m.start_date,
+    m.end_date
+  FROM payments p
+  JOIN memberships m ON p.membership_id = m.membership_id
+  JOIN membership_packages mp ON m.package_id = mp.package_id
+  WHERE m.user_id = $userId
+  ORDER BY p.payment_date DESC
+");
 ?>
 
 <section class="page-section">

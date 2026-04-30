@@ -58,13 +58,13 @@ $recentPayments = gymbrut_query_all($conn, "
 ");
 
 $chartRows = gymbrut_query_all($conn, "
-    SELECT 
-        DATE_FORMAT(created_at, '%b') AS month_name,
-        COUNT(*) AS total
-    FROM users
-    WHERE role='member'
-    GROUP BY YEAR(created_at), MONTH(created_at)
-    ORDER BY YEAR(created_at), MONTH(created_at)
+  SELECT 
+    DATE_FORMAT(created_at, '%b') AS month_name,
+    COUNT(*) AS total
+  FROM users
+  WHERE role = 'member'
+  GROUP BY YEAR(created_at), MONTH(created_at)
+  ORDER BY YEAR(created_at), MONTH(created_at)
 ");
 
 $chartLabels = [];
@@ -285,7 +285,7 @@ if (empty($chartLabels)) {
             data: {
                 labels: <?= json_encode($chartLabels) ?>,
                 datasets: [{
-                    label: 'Member Baru',
+                    label: 'Pertumbuhan Member',
                     data: <?= json_encode($chartData) ?>,
                     borderColor: '#ff7a00',
                     backgroundColor: 'rgba(255, 122, 0, 0.12)',

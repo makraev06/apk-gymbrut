@@ -39,7 +39,6 @@ $members = gymbrut_query_all($conn, "
       </div>
 
       <div class="d-flex align-center gap-8">
-        <a href="#" class="btn-outline-soft btn-sm"><i class="bi bi-funnel"></i> Filter</a>
         <a href="addMember.php" class="gradient-btn btn-sm">
           <i class="bi bi-plus-lg"></i> Tambah Member
         </a>

@@ -1,21 +1,24 @@
 <?php
 session_start();
-
-$pageTitle = 'Tambah Member';
-$topbarTitle = 'Tambah Member';
-$topbarSubtitle = 'Tambahkan member baru dan paket membership.';
-$searchPlaceholder = 'Cari...';
-
-include '../../includes/layout_top.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $error = '';
+$packages = [];
 
-$packages = gymbrut_query_all($conn, "
+/* ambil paket sebelum layout */
+$result = $conn->query("
   SELECT package_id, package_name, duration_days, price
   FROM membership_packages
   ORDER BY price ASC
 ");
 
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $packages[] = $row;
+    }
+}
+
+/* proses submit HARUS sebelum include layout */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -36,7 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($exists) {
             $error = 'Email sudah terdaftar.';
         } else {
-            $stmt = $conn->prepare("SELECT duration_days FROM membership_packages WHERE package_id = ?");
+            $stmt = $conn->prepare("
+        SELECT duration_days 
+        FROM membership_packages 
+        WHERE package_id = ?
+        LIMIT 1
+      ");
             $stmt->bind_param("i", $package_id);
             $stmt->execute();
             $package = $stmt->get_result()->fetch_assoc();
@@ -63,6 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
                 $stmt->bind_param("iisss", $user_id, $package_id, $start_date, $end_date, $status);
                 $stmt->execute();
+                $membership_id = $conn->insert_id;
+
+                /* ambil harga paket */
+                $amount = $package['price'];
+
+                /* insert payment otomatis */
+                $stmt = $conn->prepare("
+  INSERT INTO payments (membership_id, amount, status, payment_date)
+  VALUES (?, ?, 'verified', NOW())
+");
+                $stmt->bind_param("ii", $membership_id, $amount);
+                $stmt->execute();
 
                 header("Location: members.php");
                 exit;
@@ -70,6 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+$pageTitle = 'Tambah Member';
+$topbarTitle = 'Tambah Member';
+$topbarSubtitle = 'Tambahkan member baru dan paket membership.';
+$searchPlaceholder = 'Cari...';
+
+include __DIR__ . '/../../includes/layout_top.php';
 ?>
 
 <section class="page-section">
@@ -85,24 +112,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="form-card">
-        <?php if ($error): ?>
-            <div class="auth-alert auth-alert-danger mb-3"><?= e($error) ?></div>
+        <?php if (!empty($error)): ?>
+            <div class="auth-alert auth-alert-danger mb-3">
+                <?= htmlspecialchars($error) ?>
+            </div>
         <?php endif; ?>
 
         <form method="POST" class="form-grid">
             <div class="form-group">
                 <label class="form-label">Nama</label>
-                <input type="text" name="name" class="form-control" required>
+                <input type="text" name="name" class="form-control"
+                    value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" required>
+                <input type="email" name="email" class="form-control"
+                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">No HP</label>
-                <input type="text" name="phone" class="form-control">
+                <input type="text" name="phone" class="form-control"
+                    value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
             </div>
 
             <div class="form-group">
@@ -114,9 +146,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label class="form-label">Paket</label>
                 <select name="package_id" class="form-select" required>
                     <option value="">Pilih Paket</option>
+
                     <?php foreach ($packages as $package): ?>
-                        <option value="<?= e($package['package_id']) ?>">
-                            <?= e($package['package_name']) ?> - Rp <?= number_format($package['price'], 0, ',', '.') ?>
+                        <option value="<?= htmlspecialchars($package['package_id']) ?>" <?= ((int) ($_POST['package_id'] ?? 0) === (int) $package['package_id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($package['package_name']) ?> -
+                            Rp <?= number_format($package['price'], 0, ',', '.') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -124,15 +158,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="form-group">
                 <label class="form-label">Tanggal Mulai</label>
-                <input type="date" name="start_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                <input type="date" name="start_date" class="form-control"
+                    value="<?= htmlspecialchars($_POST['start_date'] ?? date('Y-m-d')) ?>" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">
-                    <option value="aktif">Aktif</option>
-                    <option value="pending">Pending</option>
-                    <option value="expired">Expired</option>
+                    <option value="aktif" <?= ($_POST['status'] ?? 'aktif') === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                    <option value="pending" <?= ($_POST['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending
+                    </option>
+                    <option value="expired" <?= ($_POST['status'] ?? '') === 'expired' ? 'selected' : '' ?>>Expired
+                    </option>
                 </select>
             </div>
 
@@ -145,4 +182,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </section>
 
-<?php include '../../includes/layout_bottom.php'; ?>
+<?php include __DIR__ . '/../../includes/layout_bottom.php'; ?>

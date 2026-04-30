@@ -32,8 +32,8 @@ $menus = [
         'icon' => 'bi bi-card-checklist'
     ],
     [
-        'url' => $base . '/admin/payments.php',
-        'key' => '/admin/payments.php',
+        'url' => $base . '/admin/payments/payments.php',
+        'key' => '/admin/payments/',
         'label' => 'Payments',
         'icon' => 'bi bi-credit-card-2-front-fill'
     ],
