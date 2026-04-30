@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Email sudah terdaftar.';
         } else {
             $stmt = $conn->prepare("
-        SELECT duration_days 
-        FROM membership_packages 
-        WHERE package_id = ?
-        LIMIT 1
-      ");
+    SELECT duration_days, price
+    FROM membership_packages 
+    WHERE package_id = ?
+    LIMIT 1
+");
             $stmt->bind_param("i", $package_id);
             $stmt->execute();
             $package = $stmt->get_result()->fetch_assoc();
@@ -113,9 +113,9 @@ include __DIR__ . '/../../includes/layout_top.php';
 
     <div class="form-card">
         <?php if (!empty($error)): ?>
-            <div class="auth-alert auth-alert-danger mb-3">
-                <?= htmlspecialchars($error) ?>
-            </div>
+        <div class="auth-alert auth-alert-danger mb-3">
+            <?= htmlspecialchars($error) ?>
+        </div>
         <?php endif; ?>
 
         <form method="POST" class="form-grid">
@@ -148,10 +148,11 @@ include __DIR__ . '/../../includes/layout_top.php';
                     <option value="">Pilih Paket</option>
 
                     <?php foreach ($packages as $package): ?>
-                        <option value="<?= htmlspecialchars($package['package_id']) ?>" <?= ((int) ($_POST['package_id'] ?? 0) === (int) $package['package_id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($package['package_name']) ?> -
-                            Rp <?= number_format($package['price'], 0, ',', '.') ?>
-                        </option>
+                    <option value="<?= htmlspecialchars($package['package_id']) ?>"
+                        <?= ((int) ($_POST['package_id'] ?? 0) === (int) $package['package_id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($package['package_name']) ?> -
+                        Rp <?= number_format($package['price'], 0, ',', '.') ?>
+                    </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -165,7 +166,8 @@ include __DIR__ . '/../../includes/layout_top.php';
             <div class="form-group">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">
-                    <option value="aktif" <?= ($_POST['status'] ?? 'aktif') === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                    <option value="aktif" <?= ($_POST['status'] ?? 'aktif') === 'aktif' ? 'selected' : '' ?>>Aktif
+                    </option>
                     <option value="pending" <?= ($_POST['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending
                     </option>
                     <option value="expired" <?= ($_POST['status'] ?? '') === 'expired' ? 'selected' : '' ?>>Expired
