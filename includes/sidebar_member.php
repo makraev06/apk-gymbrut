@@ -12,8 +12,6 @@ $menus = [
     ['file' => 'checkin.php', 'label' => 'Check In', 'icon' => 'bi bi-box-arrow-in-right'],
     ['file' => 'memberships.php', 'label' => 'Membership', 'icon' => 'bi bi-award-fill'],
     ['file' => 'payments.php', 'label' => 'Payments', 'icon' => 'bi bi-wallet2'],
-    ['file' => 'progress.php', 'label' => 'Progress', 'icon' => 'bi bi-graph-up-arrow'],
-    ['file' => 'reports.php', 'label' => 'Reports', 'icon' => 'bi bi-clipboard-data-fill'],
     ['file' => 'workouts.php', 'label' => 'Workouts', 'icon' => 'bi bi-heart-pulse-fill'],
     ['file' => 'profile.php', 'label' => 'Profile', 'icon' => 'bi bi-person-circle'],
 ];
@@ -52,7 +50,8 @@ $menus = [
             </div>
         </div>
 
-        <a href="../logout.php" class="gradient-btn sidebar-logout">
+        <a href="../logout.php" class="gradient-btn sidebar-logout"
+            onclick="return confirm('Yakin ingin logout dari akun member?');">
             <i class="bi bi-box-arrow-right"></i>
             <span>Logout</span>
         </a>

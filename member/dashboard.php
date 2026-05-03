@@ -1,101 +1,336 @@
 <?php
 /* member/dashboard.php */
 session_start();
-$_SESSION['role'] = $_SESSION['role'] ?? 'member';
-$_SESSION['name'] = $_SESSION['name'] ?? 'Michael Member';
 
-$pageTitle = 'Member Dashboard';
+$_SESSION['role'] = $_SESSION['role'] ?? 'member';
+$_SESSION['name'] = $_SESSION['name'] ?? 'Member';
+
+$pageTitle = 'Dashboard Member';
 $topbarTitle = 'Dashboard Member';
-$topbarSubtitle = 'Lihat membership, progress, dan aktivitas gym kamu dalam satu halaman.';
-$searchPlaceholder = 'Cari workout, pembayaran, membership...';
+$topbarSubtitle = 'Lihat ringkasan membership, pembayaran, dan aktivitas gym kamu.';
+$searchPlaceholder = 'Cari membership, pembayaran, progress...';
 
 include '../includes/layout_top.php';
 
 $memberName = $_SESSION['name'] ?? 'Member';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+
+/* =========================
+   MEMBERSHIP TERBARU
+========================= */
+$membership = [
+    'membership_id' => null,
+    'package_name' => 'Belum Ada',
+    'status' => 'pending',
+    'end_date' => null,
+    'price' => 0
+];
+
+$q = $conn->query("
+    SELECT 
+        m.membership_id,
+        m.status,
+        m.end_date,
+        mp.package_name,
+        mp.price
+    FROM memberships m
+    JOIN membership_packages mp ON m.package_id = mp.package_id
+    WHERE m.user_id = $userId
+    ORDER BY m.end_date DESC
+    LIMIT 1
+");
+
+if ($q && $q->num_rows > 0) {
+    $membership = $q->fetch_assoc();
+}
+
+/* =========================
+   CHECK-IN BULAN INI
+========================= */
+$checkinMonth = 0;
+
+$q = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM checkins
+    WHERE user_id = $userId
+    AND MONTH(checkin_time) = MONTH(CURDATE())
+    AND YEAR(checkin_time) = YEAR(CURDATE())
+");
+
+if ($q && $q->num_rows > 0) {
+    $checkinMonth = (int) $q->fetch_assoc()['total'];
+}
+
+/* =========================
+   PROGRESS TERAKHIR
+========================= */
+$progress = [
+    'weight_kg' => 0,
+    'muscle_mass' => 0,
+    'weekly_progress' => 'Belum ada progress',
+    'log_date' => null
+];
+
+$q = $conn->query("
+    SELECT weight_kg, muscle_mass, weekly_progress, log_date
+    FROM progress_logs
+    WHERE user_id = $userId
+    ORDER BY log_date DESC
+    LIMIT 1
+");
+
+if ($q && $q->num_rows > 0) {
+    $progress = $q->fetch_assoc();
+}
+
+/* =========================
+   PEMBAYARAN TERAKHIR
+========================= */
+$lastPayment = [
+    'payment_id' => '-',
+    'amount' => 0,
+    'status' => 'pending',
+    'payment_date' => null
+];
+
+$q = $conn->query("
+    SELECT 
+        p.payment_id,
+        p.amount,
+        p.status,
+        p.payment_date
+    FROM payments p
+    JOIN memberships m ON p.membership_id = m.membership_id
+    WHERE m.user_id = $userId
+    ORDER BY p.payment_date DESC
+    LIMIT 1
+");
+
+if ($q && $q->num_rows > 0) {
+    $lastPayment = $q->fetch_assoc();
+}
+
+/* =========================
+   WORKOUT DARI DATABASE
+========================= */
+$workouts = [];
+
+$q = $conn->query("
+    SELECT title, category, sets_count, reps_count
+    FROM workouts
+    ORDER BY workout_id DESC
+    LIMIT 3
+");
+
+if ($q) {
+    while ($row = $q->fetch_assoc()) {
+        $workouts[] = $row;
+    }
+}
+
+/* =========================
+   RIWAYAT PEMBAYARAN MEMBER
+========================= */
+$recentPayments = [];
+
+$q = $conn->query("
+    SELECT 
+        p.payment_id,
+        p.amount,
+        p.status,
+        p.payment_date,
+        mp.package_name
+    FROM payments p
+    JOIN memberships m ON p.membership_id = m.membership_id
+    JOIN membership_packages mp ON m.package_id = mp.package_id
+    WHERE m.user_id = $userId
+    ORDER BY p.payment_date DESC
+    LIMIT 5
+");
+
+if ($q) {
+    while ($row = $q->fetch_assoc()) {
+        $recentPayments[] = $row;
+    }
+}
+
+/* =========================
+   DATA FORMAT
+========================= */
+$membershipEnd = $membership['end_date']
+    ? date('d M Y', strtotime($membership['end_date']))
+    : '-';
+
+$lastPaymentDate = $lastPayment['payment_date']
+    ? date('d M Y', strtotime($lastPayment['payment_date']))
+    : '-';
+
+$membershipStatus = ucfirst($membership['status']);
+$paymentStatus = ucfirst($lastPayment['status']);
+
+$paymentBadge = 'badge-pending';
+if ($lastPayment['status'] === 'verified') {
+    $paymentBadge = 'badge-active';
+} elseif ($lastPayment['status'] === 'rejected') {
+    $paymentBadge = 'badge-failed';
+}
+
 $quickStats = [
-    ['label' => 'Membership', 'value' => 'Premium Plus', 'meta' => 'Aktif sampai 30 Jun 2026', 'icon' => 'bi bi-award-fill'],
-    ['label' => 'Check-in Bulan Ini', 'value' => '18x', 'meta' => 'Konsisten 4 minggu terakhir', 'icon' => 'bi bi-box-arrow-in-right'],
-    ['label' => 'Berat Saat Ini', 'value' => '68 kg', 'meta' => 'Turun 2 kg dari bulan lalu', 'icon' => 'bi bi-speedometer2'],
-    ['label' => 'Pembayaran Terakhir', 'value' => 'Rp 650.000', 'meta' => 'Berhasil pada 20 Apr 2026', 'icon' => 'bi bi-wallet2'],
-];
-
-$workoutSchedule = [
-    ['day' => 'Senin', 'program' => 'Strength Builder', 'time' => '18:00 WIB'],
-    ['day' => 'Rabu', 'program' => 'Cardio Blast', 'time' => '17:30 WIB'],
-    ['day' => 'Jumat', 'program' => 'Fat Loss Training', 'time' => '18:15 WIB'],
-];
-
-$recentPayments = [
-    ['invoice' => 'INV-24081', 'amount' => 'Rp 650.000', 'status' => 'Paid', 'date' => '20 Apr 2026'],
-    ['invoice' => 'INV-23890', 'amount' => 'Rp 650.000', 'status' => 'Paid', 'date' => '20 Mar 2026'],
+    [
+        'label' => 'Membership',
+        'value' => $membership['package_name'],
+        'meta' => 'Status: ' . $membershipStatus . ' • sampai ' . $membershipEnd,
+        'icon' => 'bi bi-award-fill'
+    ],
+    [
+        'label' => 'Check-in Bulan Ini',
+        'value' => $checkinMonth . 'x',
+        'meta' => 'Aktivitas gym bulan berjalan',
+        'icon' => 'bi bi-box-arrow-in-right'
+    ],
+    [
+        'label' => 'Berat Saat Ini',
+        'value' => number_format((float) $progress['weight_kg'], 1, ',', '.') . ' kg',
+        'meta' => $progress['weekly_progress'],
+        'icon' => 'bi bi-speedometer2'
+    ],
+    [
+        'label' => 'Pembayaran Terakhir',
+        'value' => 'Rp ' . number_format((float) $lastPayment['amount'], 0, ',', '.'),
+        'meta' => $paymentStatus . ' pada ' . $lastPaymentDate,
+        'icon' => 'bi bi-wallet2'
+    ],
 ];
 ?>
 
-<section class="page-section">
-    <div class="card-soft">
-        <div class="card-header-inline">
-            <div>
-                <h3 class="section-title">Halo, <?= e($memberName) ?> 👋</h3>
-                <p class="section-subtitle">Semangat latihan hari ini. Jangan lupa check-in dan jaga progresmu tetap
-                    stabil.</p>
+<div class="dashboard-hero mb-4">
+    <div>
+        <span class="banner-pill">
+            <i class="bi bi-person-heart"></i> Member Overview
+        </span>
+
+        <h2>Halo, <?= e($memberName) ?> 👋</h2>
+        <p>
+            Pantau membership, pembayaran, check-in, dan progress latihan kamu
+            dari satu dashboard.
+        </p>
+    </div>
+
+    <div class="dashboard-hero-card">
+        <span>Status Membership</span>
+        <strong><?= e($membershipStatus) ?></strong>
+        <small><?= e($membership['package_name']) ?></small>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <?php foreach ($quickStats as $item): ?>
+        <div class="col-md-6 col-xl-3">
+            <div class="stat-card stat-card-modern">
+                <div>
+                    <p class="stat-label"><?= e($item['label']) ?></p>
+                    <h3 class="stat-value" style="font-size:24px;">
+                        <?= e($item['value']) ?>
+                    </h3>
+                    <span class="stat-meta"><?= e($item['meta']) ?></span>
+                </div>
+
+                <div class="stat-icon">
+                    <i class="<?= e($item['icon']) ?>"></i>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="premium-card h-100">
+            <div class="card-header-inline">
+                <div>
+                    <h3 class="section-title">Ringkasan Membership</h3>
+                    <p class="section-subtitle">Detail paket membership kamu saat ini.</p>
+                </div>
+
+                <span class="badge-soft <?= $membership['status'] === 'aktif' ? 'badge-active' : 'badge-pending' ?>">
+                    <?= e($membershipStatus) ?>
+                </span>
             </div>
 
-            <div class="d-flex align-center gap-8">
-                <a href="checkin.php" class="gradient-btn btn-sm">
-                    <i class="bi bi-box-arrow-in-right"></i> Check In
-                </a>
-                <a href="memberships.php" class="btn-outline-soft btn-sm">
-                    <i class="bi bi-award"></i> Lihat Membership
-                </a>
-            </div>
+            <ul class="metric-list">
+                <li>
+                    <span>Paket</span>
+                    <strong>
+                        <?= e($membership['package_name']) ?>
+                    </strong>
+                </li>
+                <li>
+                    <span>Status</span>
+                    <strong>
+                        <?= e($membershipStatus) ?>
+                    </strong>
+                </li>
+                <li>
+                    <span>Berakhir</span>
+                    <strong>
+                        <?= e($membershipEnd) ?>
+                    </strong>
+                </li>
+                <li>
+                    <span>Harga Paket</span>
+                    <strong>Rp
+                        <?= number_format((float) $membership['price'], 0, ',', '.') ?>
+                    </strong>
+                </li>
+            </ul>
         </div>
     </div>
 
-    <div class="page-grid grid-4">
-        <?php foreach ($quickStats as $item): ?>
-            <div class="stat-card">
-                <div class="d-flex align-center justify-between gap-12">
-                    <div>
-                        <p class="stat-label"><?= e($item['label']) ?></p>
-                        <h3 class="stat-value" style="font-size:24px;"><?= e($item['value']) ?></h3>
-                        <div class="stat-meta"><?= e($item['meta']) ?></div>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="<?= e($item['icon']) ?>"></i>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-
-    <div class="page-grid grid-2">
-        <div class="table-card">
+    <div class="col-xl-6">
+        <div class="premium-card h-100">
             <div class="card-header-inline">
                 <div>
-                    <h3 class="section-title">Jadwal Workout Minggu Ini</h3>
-                    <p class="section-subtitle">Latihan yang sudah tersusun untuk menjaga progresmu.</p>
+                    <h3 class="section-title">Workout Terbaru</h3>
+                    <p class="section-subtitle">Data latihan dari database workout.</p>
                 </div>
             </div>
 
             <div class="card-list">
-                <?php foreach ($workoutSchedule as $item): ?>
+                <?php if (empty($workouts)): ?>
+                    <p class="text-soft mb-0">Belum ada data workout.</p>
+                <?php endif; ?>
+
+                <?php foreach ($workouts as $item): ?>
                     <div class="list-row">
                         <div>
-                            <p class="list-row-title"><?= e($item['day']) ?> — <?= e($item['program']) ?></p>
-                            <p class="list-row-subtitle">Jadwal mulai <?= e($item['time']) ?></p>
+                            <p class="list-row-title">
+                                <?= e($item['title']) ?> — <?= e($item['category']) ?>
+                            </p>
+                            <p class="list-row-subtitle">
+                                <?= e($item['sets_count'] ?? '-') ?> set • <?= e($item['reps_count'] ?? '-') ?> reps
+                            </p>
                         </div>
-                        <span class="badge-soft badge-info">Terjadwal</span>
+
+                        <span class="badge-soft badge-info">Workout</span>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="table-card">
+<div class="row g-4">
+    <div class="col-12">
+        <div class="premium-card">
             <div class="card-header-inline">
                 <div>
                     <h3 class="section-title">Riwayat Pembayaran Terakhir</h3>
                     <p class="section-subtitle">Status pembayaran membership terbaru kamu.</p>
                 </div>
+
+                <span class="badge-soft <?= e($paymentBadge) ?>">
+                    <?= e($paymentStatus) ?>
+                </span>
             </div>
 
             <div class="table-responsive">
@@ -103,18 +338,59 @@ $recentPayments = [
                     <thead>
                         <tr>
                             <th>Invoice</th>
+                            <th>Paket</th>
                             <th>Nominal</th>
                             <th>Status</th>
                             <th>Tanggal</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        <?php foreach ($recentPayments as $payment): ?>
+                        <?php if (empty($recentPayments)): ?>
                             <tr>
-                                <td><strong><?= e($payment['invoice']) ?></strong></td>
-                                <td><?= e($payment['amount']) ?></td>
-                                <td><span class="badge-soft badge-active"><?= e($payment['status']) ?></span></td>
-                                <td><?= e($payment['date']) ?></td>
+                                <td colspan="5" class="text-soft">
+                                    Belum ada pembayaran.
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+
+                        <?php foreach ($recentPayments as $payment): ?>
+                            <?php
+                            $badge = 'badge-pending';
+
+                            if ($payment['status'] === 'verified') {
+                                $badge = 'badge-active';
+                            } elseif ($payment['status'] === 'rejected') {
+                                $badge = 'badge-failed';
+                            }
+
+                            $paymentDate = $payment['payment_date']
+                                ? date('d M Y', strtotime($payment['payment_date']))
+                                : '-';
+                            ?>
+
+                            <tr>
+                                <td>
+                                    <strong>INV-<?= e($payment['payment_id']) ?></strong>
+                                </td>
+
+                                <td>
+                                    <?= e($payment['package_name']) ?>
+                                </td>
+
+                                <td>
+                                    Rp <?= number_format((float) $payment['amount'], 0, ',', '.') ?>
+                                </td>
+
+                                <td>
+                                    <span class="badge-soft <?= e($badge) ?>">
+                                        <?= e(ucfirst($payment['status'])) ?>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <?= e($paymentDate) ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -122,6 +398,6 @@ $recentPayments = [
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <?php include '../includes/layout_bottom.php'; ?>

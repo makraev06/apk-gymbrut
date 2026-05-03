@@ -100,7 +100,8 @@ $menus = [
         </div>
 
         <!-- LOGOUT -->
-        <a href="<?= $base ?>/logout.php" class="gradient-btn sidebar-logout">
+        <a href="<?= $base ?>/logout.php" class="gradient-btn sidebar-logout"
+            onclick="return confirm('Yakin ingin logout dari akun admin?');">
             <i class="bi bi-box-arrow-right"></i>
             <span>Logout</span>
         </a>

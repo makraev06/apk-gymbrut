@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password'] ?? '');
     $package_id = (int) ($_POST['package_id'] ?? 0);
     $start_date = $_POST['start_date'] ?? date('Y-m-d');
-    $status = $_POST['status'] ?? 'aktif';
+    $status = 'pending';
 
     if ($name === '' || $email === '' || $password === '' || $package_id === 0) {
         $error = 'Nama, email, password, dan paket wajib diisi.';
@@ -66,8 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $end_date = date('Y-m-d', strtotime($start_date . " +{$duration} days"));
 
                 $stmt = $conn->prepare("
-          INSERT INTO memberships (user_id, package_id, start_date, end_date, status)
-          VALUES (?, ?, ?, ?, ?)
+                INSERT INTO memberships (user_id, package_id, start_date, end_date, status)
+                VALUES (?, ?, ?, ?, ?)
         ");
                 $stmt->bind_param("iisss", $user_id, $package_id, $start_date, $end_date, $status);
                 $stmt->execute();
@@ -76,12 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 /* ambil harga paket */
                 $amount = $package['price'];
 
-                /* insert payment otomatis */
+                /* insert payment otomatis sebagai tagihan pending */
                 $stmt = $conn->prepare("
-  INSERT INTO payments (membership_id, amount, status, payment_date)
-  VALUES (?, ?, 'verified', NOW())
+                INSERT INTO payments (membership_id, amount, status, payment_date)
+                VALUES (?, ?, 'pending', NOW())
 ");
-                $stmt->bind_param("ii", $membership_id, $amount);
+                $stmt->bind_param("id", $membership_id, $amount);
                 $stmt->execute();
 
                 header("Location: members.php");
@@ -113,9 +113,9 @@ include __DIR__ . '/../../includes/layout_top.php';
 
     <div class="form-card">
         <?php if (!empty($error)): ?>
-        <div class="auth-alert auth-alert-danger mb-3">
-            <?= htmlspecialchars($error) ?>
-        </div>
+            <div class="auth-alert auth-alert-danger mb-3">
+                <?= htmlspecialchars($error) ?>
+            </div>
         <?php endif; ?>
 
         <form method="POST" class="form-grid">
@@ -148,11 +148,10 @@ include __DIR__ . '/../../includes/layout_top.php';
                     <option value="">Pilih Paket</option>
 
                     <?php foreach ($packages as $package): ?>
-                    <option value="<?= htmlspecialchars($package['package_id']) ?>"
-                        <?= ((int) ($_POST['package_id'] ?? 0) === (int) $package['package_id']) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($package['package_name']) ?> -
-                        Rp <?= number_format($package['price'], 0, ',', '.') ?>
-                    </option>
+                        <option value="<?= htmlspecialchars($package['package_id']) ?>" <?= ((int) ($_POST['package_id'] ?? 0) === (int) $package['package_id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($package['package_name']) ?> -
+                            Rp <?= number_format($package['price'], 0, ',', '.') ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -161,18 +160,6 @@ include __DIR__ . '/../../includes/layout_top.php';
                 <label class="form-label">Tanggal Mulai</label>
                 <input type="date" name="start_date" class="form-control"
                     value="<?= htmlspecialchars($_POST['start_date'] ?? date('Y-m-d')) ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select">
-                    <option value="aktif" <?= ($_POST['status'] ?? 'aktif') === 'aktif' ? 'selected' : '' ?>>Aktif
-                    </option>
-                    <option value="pending" <?= ($_POST['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending
-                    </option>
-                    <option value="expired" <?= ($_POST['status'] ?? '') === 'expired' ? 'selected' : '' ?>>Expired
-                    </option>
-                </select>
             </div>
 
             <div class="form-group full">

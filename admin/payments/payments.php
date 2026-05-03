@@ -93,12 +93,12 @@ $payments = gymbrut_query_all($conn, "
               <td>
                 <?php if ($payment['status'] === 'pending'): ?>
                   <div class="d-flex gap-8">
-                    <a href="verifyPayment.php?id=<?= e($payment['payment_id']) ?>" class="btn-outline-soft btn-sm"
+                    <a href="verifyPayments.php?id=<?= e($payment['payment_id']) ?>" class="btn-outline-soft btn-sm"
                       onclick="return confirm('Verifikasi pembayaran ini?')">
                       Verify
                     </a>
 
-                    <a href="rejectPayment.php?id=<?= e($payment['payment_id']) ?>" class="btn-outline-soft btn-sm"
+                    <a href="rejectPayments.php?id=<?= e($payment['payment_id']) ?>" class="btn-outline-soft btn-sm"
                       onclick="return confirm('Tolak pembayaran ini?')">
                       Reject
                     </a>
