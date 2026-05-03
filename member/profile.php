@@ -10,6 +10,8 @@ $topbarTitle = 'Profile Saya';
 $topbarSubtitle = 'Kelola informasi akun, data tubuh, dan target fitness kamu.';
 $searchPlaceholder = 'Cari profile...';
 
+$bodyClass = 'member-profile-page';
+
 include '../includes/layout_top.php';
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
@@ -21,16 +23,16 @@ $error = '';
    AMBIL DATA USER
 ========================= */
 $user = [
-  'user_id' => $userId,
-  'name' => '',
-  'email' => '',
-  'phone' => '',
-  'gender' => '',
-  'age' => '',
-  'height' => '',
-  'weight' => '',
-  'target_fitness' => '',
-  'created_at' => null
+    'user_id' => $userId,
+    'name' => '',
+    'email' => '',
+    'phone' => '',
+    'gender' => '',
+    'age' => '',
+    'height' => '',
+    'weight' => '',
+    'target_fitness' => '',
+    'created_at' => null
 ];
 
 $stmt = $conn->prepare("
@@ -54,51 +56,51 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result && $result->num_rows > 0) {
-  $user = $result->fetch_assoc();
+    $user = $result->fetch_assoc();
 }
 
 /* =========================
    UPDATE PROFILE
 ========================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-  $name = trim($_POST['name'] ?? '');
-  $email = trim($_POST['email'] ?? '');
-  $phone = trim($_POST['phone'] ?? '');
-  $gender = trim($_POST['gender'] ?? '');
-  $age = (int) ($_POST['age'] ?? 0);
-  $height = (float) ($_POST['height'] ?? 0);
-  $weight = (float) ($_POST['weight'] ?? 0);
-  $targetFitness = trim($_POST['target_fitness'] ?? '');
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $gender = trim($_POST['gender'] ?? '');
+    $age = (int) ($_POST['age'] ?? 0);
+    $height = (float) ($_POST['height'] ?? 0);
+    $weight = (float) ($_POST['weight'] ?? 0);
+    $targetFitness = trim($_POST['target_fitness'] ?? '');
 
-  if ($name === '') {
-    $error = 'Nama wajib diisi.';
-  } elseif ($email === '') {
-    $error = 'Email wajib diisi.';
-  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $error = 'Format email tidak valid.';
-  } elseif ($age < 0) {
-    $error = 'Umur tidak boleh negatif.';
-  } elseif ($height < 0) {
-    $error = 'Tinggi badan tidak boleh negatif.';
-  } elseif ($weight < 0) {
-    $error = 'Berat badan tidak boleh negatif.';
-  } else {
-    // Cek email sudah dipakai user lain atau belum
-    $stmt = $conn->prepare("
+    if ($name === '') {
+        $error = 'Nama wajib diisi.';
+    } elseif ($email === '') {
+        $error = 'Email wajib diisi.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Format email tidak valid.';
+    } elseif ($age < 0) {
+        $error = 'Umur tidak boleh negatif.';
+    } elseif ($height < 0) {
+        $error = 'Tinggi badan tidak boleh negatif.';
+    } elseif ($weight < 0) {
+        $error = 'Berat badan tidak boleh negatif.';
+    } else {
+        // Cek email sudah dipakai user lain atau belum
+        $stmt = $conn->prepare("
             SELECT user_id
             FROM users
             WHERE email = ?
             AND user_id != ?
             LIMIT 1
         ");
-    $stmt->bind_param("si", $email, $userId);
-    $stmt->execute();
-    $checkEmail = $stmt->get_result();
+        $stmt->bind_param("si", $email, $userId);
+        $stmt->execute();
+        $checkEmail = $stmt->get_result();
 
-    if ($checkEmail && $checkEmail->num_rows > 0) {
-      $error = 'Email sudah digunakan oleh user lain.';
-    } else {
-      $stmt = $conn->prepare("
+        if ($checkEmail && $checkEmail->num_rows > 0) {
+            $error = 'Email sudah digunakan oleh user lain.';
+        } else {
+            $stmt = $conn->prepare("
                 UPDATE users
                 SET 
                     name = ?,
@@ -112,80 +114,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                 WHERE user_id = ?
             ");
 
-      $stmt->bind_param(
-        "ssssiddsi",
-        $name,
-        $email,
-        $phone,
-        $gender,
-        $age,
-        $height,
-        $weight,
-        $targetFitness,
-        $userId
-      );
+            $stmt->bind_param(
+                "ssssiddsi",
+                $name,
+                $email,
+                $phone,
+                $gender,
+                $age,
+                $height,
+                $weight,
+                $targetFitness,
+                $userId
+            );
 
-      if ($stmt->execute()) {
-        $_SESSION['name'] = $name;
+            if ($stmt->execute()) {
+                $_SESSION['name'] = $name;
 
-        $success = 'Profile berhasil diperbarui.';
+                $success = 'Profile berhasil diperbarui.';
 
-        $user['name'] = $name;
-        $user['email'] = $email;
-        $user['phone'] = $phone;
-        $user['gender'] = $gender;
-        $user['age'] = $age;
-        $user['height'] = $height;
-        $user['weight'] = $weight;
-        $user['target_fitness'] = $targetFitness;
-      } else {
-        $error = 'Gagal memperbarui profile.';
-      }
+                $user['name'] = $name;
+                $user['email'] = $email;
+                $user['phone'] = $phone;
+                $user['gender'] = $gender;
+                $user['age'] = $age;
+                $user['height'] = $height;
+                $user['weight'] = $weight;
+                $user['target_fitness'] = $targetFitness;
+            } else {
+                $error = 'Gagal memperbarui profile.';
+            }
+        }
     }
-  }
 }
 
 /* =========================
    UPDATE PASSWORD
 ========================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
-  $newPassword = trim($_POST['new_password'] ?? '');
-  $confirmPassword = trim($_POST['confirm_password'] ?? '');
+    $newPassword = trim($_POST['new_password'] ?? '');
+    $confirmPassword = trim($_POST['confirm_password'] ?? '');
 
-  if ($newPassword === '') {
-    $error = 'Password baru wajib diisi.';
-  } elseif (strlen($newPassword) < 6) {
-    $error = 'Password minimal 6 karakter.';
-  } elseif ($newPassword !== $confirmPassword) {
-    $error = 'Konfirmasi password tidak sama.';
-  } else {
-    /*
-      Catatan:
-      Project kamu sebelumnya pakai password plain text.
-      Jadi kode ini ikut struktur project kamu.
-      Kalau mau lebih aman, nanti bisa diganti password_hash().
-    */
-    $stmt = $conn->prepare("
+    if ($newPassword === '') {
+        $error = 'Password baru wajib diisi.';
+    } elseif (strlen($newPassword) < 6) {
+        $error = 'Password minimal 6 karakter.';
+    } elseif ($newPassword !== $confirmPassword) {
+        $error = 'Konfirmasi password tidak sama.';
+    } else {
+        /*
+          Catatan:
+          Project kamu sebelumnya pakai password plain text.
+          Jadi kode ini ikut struktur project kamu.
+          Kalau mau lebih aman, nanti bisa diganti password_hash().
+        */
+        $stmt = $conn->prepare("
             UPDATE users
             SET password = ?
             WHERE user_id = ?
         ");
-    $stmt->bind_param("si", $newPassword, $userId);
+        $stmt->bind_param("si", $newPassword, $userId);
 
-    if ($stmt->execute()) {
-      $success = 'Password berhasil diperbarui.';
-    } else {
-      $error = 'Gagal memperbarui password.';
+        if ($stmt->execute()) {
+            $success = 'Password berhasil diperbarui.';
+        } else {
+            $error = 'Gagal memperbarui password.';
+        }
     }
-  }
 }
 
 /* =========================
    DATA TAMBAHAN
 ========================= */
 $createdAtText = !empty($user['created_at'])
-  ? date('d M Y', strtotime($user['created_at']))
-  : '-';
+    ? date('d M Y', strtotime($user['created_at']))
+    : '-';
 
 $ageText = !empty($user['age']) ? $user['age'] . ' tahun' : '-';
 $heightText = !empty($user['height']) ? number_format((float) $user['height'], 1, ',', '.') . ' cm' : '-';
@@ -197,27 +199,27 @@ $bmiText = '-';
 $bmiStatus = '-';
 
 if (!empty($user['height']) && !empty($user['weight']) && (float) $user['height'] > 0) {
-  $heightMeter = (float) $user['height'] / 100;
-  $bmi = (float) $user['weight'] / ($heightMeter * $heightMeter);
-  $bmiText = number_format($bmi, 1, ',', '.');
+    $heightMeter = (float) $user['height'] / 100;
+    $bmi = (float) $user['weight'] / ($heightMeter * $heightMeter);
+    $bmiText = number_format($bmi, 1, ',', '.');
 
-  if ($bmi < 18.5) {
-    $bmiStatus = 'Underweight';
-  } elseif ($bmi < 25) {
-    $bmiStatus = 'Normal';
-  } elseif ($bmi < 30) {
-    $bmiStatus = 'Overweight';
-  } else {
-    $bmiStatus = 'Obese';
-  }
+    if ($bmi < 18.5) {
+        $bmiStatus = 'Underweight';
+    } elseif ($bmi < 25) {
+        $bmiStatus = 'Normal';
+    } elseif ($bmi < 30) {
+        $bmiStatus = 'Overweight';
+    } else {
+        $bmiStatus = 'Obese';
+    }
 }
 
 $profileCompletion = 0;
 $fields = ['name', 'email', 'phone', 'gender', 'age', 'height', 'weight', 'target_fitness'];
 foreach ($fields as $field) {
-  if (!empty($user[$field])) {
-    $profileCompletion++;
-  }
+    if (!empty($user[$field])) {
+        $profileCompletion++;
+    }
 }
 $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
 ?>
@@ -242,21 +244,38 @@ $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
     </div>
 </div>
 
+<div class="premium-card mb-4 mobile-profile-logout">
+    <div class="card-header-inline">
+        <div>
+            <h3 class="section-title">Akun Member</h3>
+            <p class="section-subtitle">
+                Keluar dari akun member kamu.
+            </p>
+        </div>
+
+        <a href="../logout.php" class="btn-outline-soft" onclick="return confirm('Yakin ingin logout?')"
+            style="color:#dc2626; border-color:#fecaca; background:#fff1f2;">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </a>
+    </div>
+</div>
+
 <?php if ($success): ?>
-      <div class="alert alert-success">
-          <i class="bi bi-check-circle"></i>
-          <?= e($success) ?>
-      </div>
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i>
+        <?= e($success) ?>
+    </div>
 <?php endif; ?>
 
 <?php if ($error): ?>
-      <div class="alert alert-danger">
-          <i class="bi bi-exclamation-circle"></i>
-          <?= e($error) ?>
-      </div>
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle"></i>
+        <?= e($error) ?>
+    </div>
 <?php endif; ?>
 
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-4 profile-stats-row">
     <div class="col-md-6 col-xl-3">
         <div class="stat-card stat-card-modern">
             <div>
@@ -340,35 +359,20 @@ $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Nama Lengkap</label>
-                        <input 
-                            type="text" 
-                            name="name" 
-                            class="form-control"
-                            value="<?= e($user['name'] ?? '') ?>"
-                            required
-                        >
+                        <input type="text" name="name" class="form-control" value="<?= e($user['name'] ?? '') ?>"
+                            required>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input 
-                            type="email" 
-                            name="email" 
-                            class="form-control"
-                            value="<?= e($user['email'] ?? '') ?>"
-                            required
-                        >
+                        <input type="email" name="email" class="form-control" value="<?= e($user['email'] ?? '') ?>"
+                            required>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">No. Telepon</label>
-                        <input 
-                            type="text" 
-                            name="phone" 
-                            class="form-control"
-                            value="<?= e($user['phone'] ?? '') ?>"
-                            placeholder="Contoh: 08123456789"
-                        >
+                        <input type="text" name="phone" class="form-control" value="<?= e($user['phone'] ?? '') ?>"
+                            placeholder="Contoh: 08123456789">
                     </div>
 
                     <div class="form-group">
@@ -386,40 +390,20 @@ $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
 
                     <div class="form-group">
                         <label class="form-label">Umur</label>
-                        <input 
-                            type="number" 
-                            name="age" 
-                            class="form-control"
-                            value="<?= e($user['age'] ?? '') ?>"
-                            min="0"
-                            placeholder="Contoh: 21"
-                        >
+                        <input type="number" name="age" class="form-control" value="<?= e($user['age'] ?? '') ?>"
+                            min="0" placeholder="Contoh: 21">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Tinggi Badan (cm)</label>
-                        <input 
-                            type="number" 
-                            step="0.1"
-                            name="height" 
-                            class="form-control"
-                            value="<?= e($user['height'] ?? '') ?>"
-                            min="0"
-                            placeholder="Contoh: 170"
-                        >
+                        <input type="number" step="0.1" name="height" class="form-control"
+                            value="<?= e($user['height'] ?? '') ?>" min="0" placeholder="Contoh: 170">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Berat Badan (kg)</label>
-                        <input 
-                            type="number" 
-                            step="0.1"
-                            name="weight" 
-                            class="form-control"
-                            value="<?= e($user['weight'] ?? '') ?>"
-                            min="0"
-                            placeholder="Contoh: 65"
-                        >
+                        <input type="number" step="0.1" name="weight" class="form-control"
+                            value="<?= e($user['weight'] ?? '') ?>" min="0" placeholder="Contoh: 65">
                     </div>
 
                     <div class="form-group">
@@ -454,7 +438,7 @@ $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
     </div>
 
     <div class="col-xl-5">
-        <div class="premium-card h-100">
+        <div class="premium-card h-100 profile-summary-card">
             <div class="card-header-inline">
                 <div>
                     <h3 class="section-title">Ringkasan Data</h3>
@@ -519,24 +503,14 @@ $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
 
                 <div class="form-group mb-3">
                     <label class="form-label">Password Baru</label>
-                    <input 
-                        type="password" 
-                        name="new_password" 
-                        class="form-control"
-                        placeholder="Masukkan password baru"
-                        required
-                    >
+                    <input type="password" name="new_password" class="form-control" placeholder="Masukkan password baru"
+                        required>
                 </div>
 
                 <div class="form-group mb-3">
                     <label class="form-label">Konfirmasi Password</label>
-                    <input 
-                        type="password" 
-                        name="confirm_password" 
-                        class="form-control"
-                        placeholder="Ulangi password baru"
-                        required
-                    >
+                    <input type="password" name="confirm_password" class="form-control"
+                        placeholder="Ulangi password baru" required>
                 </div>
 
                 <button type="submit" class="gradient-btn">
@@ -548,7 +522,7 @@ $profileCompletionPercent = round(($profileCompletion / count($fields)) * 100);
     </div>
 
     <div class="col-xl-6">
-        <div class="premium-card h-100">
+        <div class="premium-card h-100 profile-notes-card">
             <div class="card-header-inline">
                 <div>
                     <h3 class="section-title">Catatan Profile</h3>

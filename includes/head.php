@@ -22,4 +22,5 @@ $basePath = ($currentDir === 'admin' || $currentDir === 'member') ? '../' : '';
     <link rel="stylesheet" href="/rpl-web/assets/css/sidebar.css">
     <link rel="stylesheet" href="/rpl-web/assets/css/topbar.css">
     <link rel="stylesheet" href="/rpl-web/assets/css/auth.css">
+    <link rel="stylesheet" href="/rpl-web/assets/css/mobile-member.css">
 </head>

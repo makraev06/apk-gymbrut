@@ -1,41 +1,119 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+$topbarTitle = $topbarTitle ?? ($pageTitle ?? 'Dashboard');
+$topbarSubtitle = $topbarSubtitle ?? '';
+$searchPlaceholder = $searchPlaceholder ?? 'Cari...';
+
+$userName = $_SESSION['name'] ?? 'User';
+$userRole = $_SESSION['role'] ?? 'member';
+
+$initial = strtoupper(substr($userName, 0, 1));
+
+$notifCount = 0;
+$notifications = [];
+
+if ($userRole === 'member' && isset($conn)) {
+    $notifUserId = (int) ($_SESSION['user_id'] ?? 0);
+
+    if ($notifUserId > 0) {
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) AS total
+            FROM notifications
+            WHERE user_id = ?
+            AND is_read = 0
+        ");
+        $stmt->bind_param("i", $notifUserId);
+        $stmt->execute();
+        $countResult = $stmt->get_result();
+
+        if ($countResult && $countResult->num_rows > 0) {
+            $notifCount = (int) $countResult->fetch_assoc()['total'];
+        }
+
+        $stmt = $conn->prepare("
+            SELECT notification_id, title, message, type, is_read, created_at
+            FROM notifications
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 5
+        ");
+        $stmt->bind_param("i", $notifUserId);
+        $stmt->execute();
+        $notifResult = $stmt->get_result();
+
+        if ($notifResult) {
+            while ($row = $notifResult->fetch_assoc()) {
+                $notifications[] = $row;
+            }
+        }
+    }
 }
-
-$topbarTitle = $topbarTitle ?? ($pageTitle ?? 'GYMBRUT');
-$topbarSubtitle = $topbarSubtitle ?? 'Kelola aktivitas gym dengan tampilan yang rapi dan modern.';
-$searchPlaceholder = $searchPlaceholder ?? 'Cari data...';
-
-$userName = $_SESSION['name'] ?? 'Guest';
-$role = strtolower($_SESSION['role'] ?? 'member');
-$roleLabel = $role === 'admin' ? 'Admin' : 'Member';
 ?>
 
-<header class="topbar">
+<div class="topbar">
     <div class="topbar-left">
         <h1><?= e($topbarTitle) ?></h1>
-        <p><?= e($topbarSubtitle) ?></p>
+
+        <?php if (!empty($topbarSubtitle)): ?>
+            <p><?= e($topbarSubtitle) ?></p>
+        <?php endif; ?>
     </div>
 
     <div class="topbar-right">
-        <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="<?= e($searchPlaceholder) ?>">
+        <div class="topbar-search topbar-search-clean" style="
+        width: 360px;
+        height: 54px;
+        min-height: 54px;
+        background: #ffffff;
+        border: 2px solid #cbd5e1;
+        border-radius: 18px;
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        box-sizing: border-box;
+    ">
+            <i class="bi bi-search" style="font-size:20px; color:#334155;"></i>
+
+            <span class="topbar-search-placeholder" style="
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        ">
+                <?= e($searchPlaceholder) ?>
+            </span>
         </div>
 
-        <button type="button" class="icon-btn" title="Notifikasi">
-            <i class="bi bi-bell"></i>
-        </button>
+        <?php if ($userRole === 'member'): ?>
+            <div class="notif-wrapper">
+                <a href="../member/notifications.php" class="icon-btn notif-toggle">
+                    <i class="bi bi-bell"></i>
+
+                    <?php if ($notifCount > 0): ?>
+                        <span class="notif-badge"><?= e($notifCount) ?></span>
+                    <?php endif; ?>
+                </a>
+            </div>
+        <?php else: ?>
+            <button type="button" class="icon-btn">
+                <i class="bi bi-bell"></i>
+            </button>
+        <?php endif; ?>
 
         <div class="profile-chip">
-            <div class="profile-chip-avatar">
-                <?= strtoupper(substr($userName, 0, 1)) ?>
-            </div>
+            <span class="profile-chip-avatar">
+                <?= e($initial) ?>
+            </span>
+
             <div>
-                <p class="profile-chip-name"><?= e($userName) ?></p>
-                <p class="profile-chip-role"><?= e($roleLabel) ?></p>
+                <strong><?= e($userName) ?></strong>
+                <small><?= e(ucfirst($userRole)) ?></small>
             </div>
         </div>
     </div>
-</header>
+</div>
+
+</script>

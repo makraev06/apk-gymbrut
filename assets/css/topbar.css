@@ -1,159 +1,373 @@
-/* ---------- TOPBAR ---------- */
+/* assets/css/topbar.css */
+
+/* ================= TOPBAR ================= */
 
 .topbar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-soft);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 12px 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: var(--shadow-sm);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.topbar-left {
+  min-width: 0;
+  flex: 1;
 }
 
 .topbar-left h1 {
-  margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 800;
-  line-height: 1.15;
-  color: var(--text);
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.04em;
 }
 
 .topbar-left p {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   color: var(--text-soft);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
   justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
 }
 
-.search-box {
-  width: 300px;
-  max-width: 300px;
+/* ================= SEARCH BOX ================= */
+
+.topbar-search {
+  width: 360px;
+  height: 54px;
+  min-height: 54px;
+  background: #eef2f7;
+  border: 2px solid #cbd5e1;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 6px 14px rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
-  gap: 9px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  padding: 9px 12px;
+  gap: 12px;
+  padding: 0 16px;
+  color: #334155;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.search-box i {
-  color: var(--text-fade);
-  font-size: 16px;
+.topbar-search:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
 }
 
-.search-box input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  outline: none;
-  color: var(--text);
+.topbar-search i {
+  font-size: 20px;
+  color: #334155;
+  flex-shrink: 0;
+}
+
+.topbar-search-placeholder {
+  display: block;
+  color: #334155;
   font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.search-box input::placeholder {
-  color: var(--text-fade);
-}
+/* ================= ICON BUTTON ================= */
 
 .icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 13px;
+  width: 54px;
+  height: 54px;
   border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  display: flex;
+  border-radius: 18px;
+  background: #ffffff;
+  color: var(--text-main);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition);
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  text-decoration: none;
   flex-shrink: 0;
 }
 
 .icon-btn:hover {
-  background: var(--primary-soft);
-  color: var(--primary-dark);
-  border-color: var(--primary-border);
+  background: #fff7ef;
+  color: var(--primary);
+  border-color: rgba(249, 115, 22, 0.25);
 }
 
+/* ================= PROFILE CHIP ================= */
+
 .profile-chip {
+  height: 54px;
+  min-height: 54px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 8px 14px 8px 10px;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 6px 10px;
+  color: var(--text-main);
   flex-shrink: 0;
+  max-width: 220px;
+  overflow: hidden;
 }
 
 .profile-chip-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), #ff9f45);
-  color: #fff;
-  display: flex;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #ffffff;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 15px;
+  font-weight: 900;
   flex-shrink: 0;
 }
 
-.profile-chip-name {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.1;
+.profile-chip div {
+  min-width: 0;
+  overflow: hidden;
 }
 
-.profile-chip-role {
-  margin: 2px 0 0;
+.profile-chip strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-chip small {
+  display: block;
   font-size: 12px;
   color: var(--text-soft);
+  font-weight: 600;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* ================= NOTIFICATION ================= */
 
-@media (max-width: 991.98px) {
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.notif-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-  .topbar-right {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
+.notif-toggle {
+  position: relative;
+}
 
-  .search-box {
-    width: 100%;
-    max-width: 100%;
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid #ffffff;
+}
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 340px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.18);
+  z-index: 99999;
+}
+
+.notif-dropdown[hidden] {
+  display: none !important;
+}
+
+.notif-dropdown.show {
+  display: block !important;
+}
+
+.notif-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.notif-header strong {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.notif-header span {
+  font-size: 12px;
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.notif-item {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--text-main);
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.notif-item:hover {
+  background: #fff7ef;
+}
+
+.notif-item.unread {
+  background: #fff7ef;
+  border-left: 4px solid var(--primary);
+  padding-left: 12px;
+}
+
+.notif-item strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  margin: 0 0 4px;
+  color: var(--text-main);
+}
+
+.notif-item p {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.notif-item small {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.notif-empty {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1200px) {
+  .topbar-search {
+    width: 260px;
   }
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 992px) {
+  .topbar-search {
+    display: none;
+  }
+
   .topbar {
-    padding: 12px 14px;
-    border-radius: 16px;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 14px;
+    border-radius: 22px;
+    gap: 10px;
   }
 
   .topbar-left h1 {
-    font-size: 22px;
+    font-size: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .topbar-left p {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+    font-size: 18px;
   }
 
   .profile-chip {
-    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    padding: 6px 10px 6px 7px;
+    border-radius: 16px;
+    gap: 8px;
+    max-width: 150px;
+  }
+
+  .profile-chip-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+  }
+
+  .profile-chip strong {
+    font-size: 13px;
+  }
+
+  .profile-chip small {
+    font-size: 11px;
+  }
+
+  .notif-dropdown {
+    position: fixed;
+    top: 76px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 70vh;
   }
 }

@@ -23,7 +23,7 @@ $basePath = ($isAdminPage || $isMemberPage) ? '../' : '';
 <html lang="id">
 <?php include __DIR__ . '/head.php'; ?>
 
-<body>
+<body class="<?= e($bodyClass ?? '') ?>">
     <div class="app-shell">
         <?php if ($isAdminPage): ?>
             <?php include __DIR__ . '/sidebar_admin.php'; ?>
